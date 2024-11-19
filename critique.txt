@@ -1,0 +1,313 @@
+Web Architecture Hypertext Technology: REST API
+COMP3227 Coursework 2024/25 - API Critique
+Shaho Zagrosi (sz10g21; 33381836; sz10g21@soton.ac.uk)
+
+>Positives
+-> Good use of HTTP methods:
+
+All the standard HTTP methods are present and apparent from testing. Operations such as ```GET```, ```POST```, ```PUT```, ```PATCH```, ```DELETE```, and ```OPTIONS``` are supported for the resources, with ```OPTIONS``` returning respectively allowed methods. This is in line with W3C's Interaction Principle that retrieval should be safe - safe methods like ```GET``` are executed for resource retrieval without side effects.
+
+Method Querying:
+```
+{
+  "allowedMethods": [
+    "DELETE",
+    "GET",
+    "HEAD",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT"
+  ],
+}
+```
+
+The API's use of these idempotent methods means the outcomes are repeatable without side effects, fulfilling REST's uniform interface constraint. ```GET /module/``` always reponds with a complete list of modules posted to the server, and ```DELETE /student/sz10g21``` will always attempt a delete on the student ```sz10g21``` regardless of how many times this request is invoked. Broadly speaking, the stateless nature of these operations (each request contains all necessary context) complies with REST's stateless constraint, which improves system scalability, while the use of ```GET``` for retrieving and ```POST``` for creating falls into the uniform interface principle (clear actions for each resource), allowing for a simple, decoupled API architecture.
+
+Resource Creation:
+```
+{
+    name: 'Create Student Record',
+    method: 'POST',
+    endpoint: '/student',
+    acceptTypes: ['application/json'],
+    description: 'Create new student record',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: {
+        username: "sz10g21",
+        firstnames: "Shaho",
+        lastname: "Zagrosi",
+        part: "3",
+        enrolledin: ["/delivery/050198"],
+        self: "/student/sz10g21"
+    }
+}
+```
+
+The above response from the test suite is an example of client-server separation (a REST constraint). Meaning, the client only needs to know the endpoint (```/student```) and required data structure, and does not need to know how the server stores/processes the data. The server, in turn, has the freedom to change its internal implementation so long as it maintains this public interface, improving portability and allowing both client and server components to evolve independently. The safety aspect is also preserved, as is evident with ```GET``` and ```OPTIONS``` - their invocation only retrieves data and metadata regarding allowed methods respectively, without modifying the underlying resources upon which they are invoked. Each request appears to be self-contained, including all the context required for their execution. This is in line with the principle of stateless communication/REST's stateless constraint.
+
+-> Adequate resource identification:
+
+The below example shows the API's compliance with W3C's Resource Identification principle that all URIs should be resolvable, with every entity of interest being identified by a unique URI.
+
+Unique URI:
+```
+"data": {
+    "Code": "33381836",
+    "Title": "Test Module",
+    "Description": "Testing POST method",
+    "self": "/module/33381836",
+    "delivery": [
+      "/delivery/050198JSON"
+    ]
+}
+```
+
+Hence, each resource has its own URI that follows a clear hierarchical structure (```/module/33381836```, ```/delivery/050198JSON```), and related resources are linked via URI references (rather than by embedding data), allowing for resource discovery through navigation.
+
+-> Presence of cache control:
+
+Whilst none of the responses I came across allowed caching, it is good that ```cache-control``` and ```pragma``` are included in the HTTP headers nonetheless, as the presence of these headers shows compliance with REST's layered system constraint.
+
+Cache Control:
+```
+"headers": {
+    "cache-control": "no-store, no-cache, must-revalidate, max-age=0",
+    "content-type": "text/html; charset=UTF-8",
+    "pragma": "no-cache"
+  }
+```
+
+The API would still function without these headers - in this case, the API stops clients or intermediaries caching (perhaps for security reasons), and uses pragma as a fallback to improve compatibility. Most importantly, this ties into the HTTP principle of cacheability - RESTful APIs can leverage caching to improve performance, although the zero caching present in this API doesn't provide this additional benefit by design.
+
+-> Consistent status codes in responses:
+
+The status codes returned from the test suite indicate their appropriate, and they align clearly with the actions that the operations performed. The server responds with ```200 OK``` for successful ```GET``` requests on endpoints such as ```/students``` or ```/module/{id}```, ```201 Created``` accompanied by a ```Location``` header when the client successfully ```POST /module/``` with valid data fields, and ```204 No Content``` when we call ```DELETE /student/{id}```; error codes like ```404 Bad Request```, ```404 Not Found```, ```405 Method Not Allowed```, and ```500 Internal Server Error``` were logged in response to invalid requests.
+
+Success Response:
+```
+Status: 200 OK
+Response:
+{
+  "status": 200,
+  "statusText": "OK",
+  "contentType": "application/json",
+  "allowedMethods": [],
+  "headers": {
+    "cache-control": "no-store, no-cache, must-revalidate, max-age=0",
+    "content-type": "text/html; charset=UTF-8",
+    "pragma": "no-cache"
+  },
+  "data": {
+    "CRN": "050198",
+    "Module": "",
+    "AcademicYear": "2526",
+    "ModuleLeader": "Zagrosi Shaho",
+    "self": "/delivery/050198",
+    "module": "/module/33381836",
+    "student": []
+  }
+}
+```
+
+This is a good example of the API's alignment with the aforementioned RESTful principles of statelessness and uniform interface. The first due to the status code reflecting the state of the current request without relying on previous interactions, and the latter owing to standardised client-server communication (helping clients to predict outcomes as per the method used and the status code received in response). Responses such as ```Method Not Allowed``` or ```Not Found``` accompany errors in line with REST practices, the status codes enabling clients to understand and handle responses without out-of-band information. Thus, any failures are explicit and actionable by the client as per error transparency/REST visibility principle. The API therefore reduces obstacles in debugging, its behaviour is predictable, has reduced ambiguity, and good error handling.
+
+Error Response:
+```
+// Error 404:
+"data": {
+    "message": "404 Not Found",
+    "exception": [
+      {
+        "type": "Slim\\Exception\\HttpNotFoundException",
+        "code": 404,
+        "message": "No record of type Module was found with key 123456 SELECT * FROM `Module` WHERE   (Module.Code='123456')",
+        "file": "/usr/share/nginx/html/comp3227-api/src/inc/restfulFacade.php",
+        "line": 124
+      }
+     ]
+    }
+
+// Error 405:
+"data": {
+    "message": "405 Method Not Allowed",
+    "exception": [
+      {
+        "type": "Slim\\Exception\\HttpMethodNotAllowedException",
+        "code": 405,
+        "message": "Method not allowed. Must be one of: GET",
+        "file": "/usr/share/nginx/html/comp3227-api/vendor/slim/slim/Slim/Middleware/RoutingMiddleware.php",
+        "line": 79
+      }
+    ]
+  }
+```
+
+As is evident from the examples above, detailed metadata is provided in error responses with the ```message``` field specifying the reason and prompts for remediation, further enforcing client-server separation. Clients needn't understand server implementation details, only the standardised status codes to handle responses appropriately.
+
+-> Supports multiple formats:
+
+The test suite was able to prove the API's content-type negotiation, an important aspect of RESTful API design for flexibility and usability in heterogeneous environments. Multiple formats are supported for response bodies, namely ```application/json```, ```application/xml```, and ```text/html``` - improving API parsing on modern web apps, legacy systems relying on hierarchical data, and browsers alike. This also helps to decouple content, presentation, and interaction, as per W3C's Representation Principle #1 and the principle that 'representation formats should be reused' rather than creating new formats. The COMP3227 API's use of standard status codes is also an example of the implementation of the layered system constraint (for instance, proxies can use these codes to make routing decisions, all without understanding application-specific details). Content types are confirmed in the response body with ```"contentType":, and the ```"data": {}``` represents this accordingly.
+
+Content Types:
+```
+// JSON
+"data": {
+    "Code": "33381836",
+    "Title": "Test Module",
+    "Description": "Testing POST method",
+    "self": "/module/33381836",
+    "delivery": [
+      "/delivery/050198JSON"
+    ]
+}
+
+// XML
+"data": "\n\n  <?xml version="1.0" encoding="utf-8" standalone="no"?>
+<module>
+  <code>33381836</code>
+  <title>Test Module</title>
+  <description>Testing POST method</description>
+  <self>/module/33381836</self>
+  <delivery>/delivery/050198JSON</delivery>
+</module>\n"
+```
+
+Implementation of self-descriptive messaging is evident in these responses. The ```self``` links present in the examples above correctly point to the resources themselves to help client navigation, an example of Hypermedia as the Engine of Application State (HATEOAS), a vital REST constraint. Servers can store data in whatever format they choose internally and clients can request the data in whatever format best suits their needs (so long as it's offered by the server), decoupling client and server to scale independently (unless content type support changes).
+
+>Negatives
+-> Incomplete metadata for successful operations:
+
+Despite the error responses being detailed and helpful for debugging, success responses are less informative. The use of ```Location``` headers would be useful in success responses (id est, ```POST``` or ```PUT```) for better self-descriptive messaging and compliance to HATEOAS guidelines. The inclusion of a ```Location``` header in these responses (pointing to resources' canonical URLs) would stay the client from having to manually extract the resource URL from the response body, allowing them to navigate more dynamically, improving the API's compliance with the REST principle of discoverability through hypermedia.
+
+Suggested Location Pointer:
+```
+{
+  "status": 201,
+  "statusText": "Created",
+  "headers": {
+    "Location": "/module/{id}" // Currently non-existent
+  },
+  "data": { ... }
+}
+```
+
+It also became apparent in testing that ```JSON``` requests were incorrectly responded to with ```text/html``` in the ```content-type``` header, even when the payload is clearly ```JSON``` formatted. This inconsistency should be rectified in the API to correctly label headers according to the format requested, as this creates ambiguity for users. Clients may rely on this header to decide how to parse certain responses, and the API's current implementation would likely result in client-side parsing errors or unnecessary additional content validation steps. Otherwise, the API doesn't follow HTTP content negotiation principles by sending this misleading metadata.
+
+Content-Type Mismatch:
+```
+Status: 201 Created
+Response:
+{
+  "status": 201,
+  "statusText": "Created",
+  "contentType": "application/json", // JSON request
+  "allowedMethods": [],
+  "headers": {
+    "cache-control": "no-store, no-cache, must-revalidate, max-age=0",
+    "content-type": "text/html; charset=UTF-8", // misleading text/html, should be "application/json"
+    "pragma": "no-cache"
+  },
+  "data": { // JSON data
+    "CRN": "050198JSON",
+    "Module": null,
+    "AcademicYear": "2526",
+    "ModuleLeader": "Shaho Zagrosi",
+    "self": "/delivery/050198JSON",
+    "module": "/module/33381836",
+    "student": []
+  } 
+}
+```
+
+The COMP3227 API would also be improved with the addition of headers such as ```ETag``` or ```Last-Modified```. Used in conjunction with adequate caching measures (currently refused), clients would be able to cache operations more efficiently and execute conditional requests (id est, ```If-None-Match```). Unfortunately, the API fails to leverage REST's cacheability constraint in its current state.
+
+Suggested Header Additions:
+```
+"headers": {
+  "ETag": "abc123",
+  "Last-Modified": "Mon, 18 Nov 2024 03:50:02 GMT"
+}
+```
+
+-> No support for pagination:
+
+It would be highly beneficial to implement pagination for endpoints that return collections (id est, ```/students``` or ```/modules```). This would provide important information on the number of total items in a collection, such that the client wouldn't have to guess the size of the dataset or count the number of elements via brute-force iteration, resulting in unnecessary overhead.
+
+Suggested Pagination Metadata:
+```
+{
+  "data": [
+    { "Username": "sz10g21", "FirstNames": "Sss", "LastName": "Zzz" },
+    { "Username": "sz11g22", "FirstNames": "Zzz", "LastName": "Sss" },
+    // ...
+  ],
+  "metadata": {
+    "totalItems": 200,
+    "page": 1,
+    "pageSize": 10,
+    "nextPage": "/students?page=2",
+    "prevPage": null
+  }
+}
+```
+
+Pagination would therefore inform clients of the total number of items, page sizing, and provide explicit links to previous/subsequent pages, rendering navigation less cumbersome. The absence of pagination fails to comply with the REST principle of scalability through component interaction constraints, and fails to completely implement the principle of self-descriptive messages for collection resources.
+
+-> Ambiguous field values/names:
+
+Whilst responses include ```self``` links, certain fields have ```null``` or inconsistent values. This reduces the API's informativeness in responses, making it difficult to navigate or discover relationships between resources. It would be better to return meaningful values, even if they are defaulted (id est, ```unknown```), reducing development effort required for workarounds and the likelihood of parsing errors. Crucially, this violates REST's uniform interface constraint due to unnecessary coupling between clients and specific interface implementations.
+
+Inconsistency in Module Tag:
+```
+// 201 Created in response to GET, PATCH
+"Module": null
+
+// 200 OK in response to POST, PUT
+"Module": ""
+```
+
+While I found the API to broadly follow resource identification principles, the test suite exposed the API's lack of consistency when it comes to naming conventions/URIs. While it makes sure to adhere to noun-based naming over verbs, I would recommend full adherence to a single field casing style over the current mix of PascalCase and CamelCase (id est, ```Module``` vs ```delivery```) to improve clarity. In the case of ```delivery``` (which points to an array of deliveries), it would be more aptly named ```deliveryLinks``` to better reflect its purpose and data type as an array that can contain multiple deliveries. Otherwise, this directly contradicts W3C's principle of consistent representations.
+
+Suggested Casing/Naming Improvements:
+```
+{
+  "username": "sz10g21",
+  "firstNames": "Shaho",
+  "lastName": "Zagrosi",
+  "part": 3,
+  "enrolledDeliveries": [
+    "/delivery/050198JSON"
+  ],
+  "selfLink": "/student/sz10g21"
+}
+```
+
+A more RESTful approach would be to use URIs for all resource references, better complying with W3C's principle that all entities of interest should be identified by URIs.
+
+Suggested URI Improvements:
+```
+{
+  "module": "/module/33381836",
+  "enrolledStudents": [
+    "/student/sz10g21",
+    "/student/sz11g22"
+  ],
+  "moduleLeader": "/staff/sz10g21"
+}
+```
+
+This improves the discoverability of related resources, and the lack thereof weakens HATEOAS implementation by obscuring resource relationships. Further building upon this, the separate use of ```/students/``` and ```/student/``` should also be changed.
+
+Suggested Student Restructuring:
+```
+GET /student/          // List all students
+POST /student/         // Create new student
+GET /student/{id}      // Get specific student
+PUT /student/{id}      // Update specific student
+DELETE /student/{id}   // Delete specific student
+```
+
+This merger would improve URI consistency and further complying with W3C's consistent representation principle.

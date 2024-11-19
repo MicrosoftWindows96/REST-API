@@ -1,0 +1,1 @@
+This is a project to explore and build a test suite for a REST API, starting with a base URI.
