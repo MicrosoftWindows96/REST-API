@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SZ10G21 - REST API Extension</title>
+    <style>
+        /* GitHub Dark theme colors */
+        :root {
+            --color-canvas-default: #0d1117;
+            --color-canvas-subtle: #161b22;
+            --color-canvas-inset: #010409;
+            --color-border-default: #30363d;
+            --color-border-muted: #21262d;
+            --color-accent-fg: #58a6ff;
+            --color-accent-emphasis: #1f6feb;
+            --color-success-fg: #3fb950;
+            --color-attention-fg: #d29922;
+            --color-severe-fg: #db6d28;
+            --color-danger-fg: #f85149;
+            --color-done-fg: #a371f7;
+            --color-fg-default: #c9d1d9;
+            --color-fg-muted: #8b949e;
+            --color-fg-subtle: #484f58;
+            --color-primer-shadow-highlight: rgba(201,209,217,0.15);
+            --color-primer-shadow-inset: rgba(1,4,9,0.9);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--color-fg-default);
+            background-color: var(--color-canvas-default);
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        h1, h2, h3, h4 {
+            font-weight: 600;
+            margin-top: 24px;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            padding-bottom: 16px;
+            font-size: 32px;
+            border-bottom: 1px solid var(--color-border-muted);
+        }
+
+        h2 {
+            font-size: 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--color-border-muted);
+        }
+
+        h3 {
+            font-size: 20px;
+        }
+
+        h4 {
+            font-size: 16px;
+            color: var(--color-fg-default);
+        }
+
+        p {
+            margin-bottom: 16px;
+        }
+
+        a {
+            color: var(--color-accent-fg);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul {
+            margin-bottom: 16px;
+            padding-left: 32px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        section {
+            margin: 32px 0;
+            padding: 16px;
+            background: var(--color-canvas-subtle);
+            border: 1px solid var(--color-border-default);
+            border-radius: 6px;
+        }
+
+        .endpoint {
+            margin: 24px 0;
+            padding: 16px;
+            background: var(--color-canvas-inset);
+            border: 1px solid var(--color-border-muted);
+            border-radius: 6px;
+            box-shadow: 0 1px 0 var(--color-primer-shadow-highlight);
+        }
+
+        .method {
+            display: inline-block;
+            padding: 2px 6px;
+            margin-right: 8px;
+            border-radius: 2em;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            border: 1px solid transparent;
+        }
+
+        .get { 
+            color: var(--color-success-fg);
+            background-color: rgba(46, 160, 67, 0.15);
+            border-color: var(--color-success-fg);
+        }
+        
+        .post { 
+            color: var(--color-done-fg);
+            background-color: rgba(163, 113, 247, 0.15);
+            border-color: var(--color-done-fg);
+        }
+        
+        .put { 
+            color: var(--color-attention-fg);
+            background-color: rgba(210, 153, 34, 0.15);
+            border-color: var(--color-attention-fg);
+        }
+
+        .patch { 
+            color: #76e3ea;
+            background-color: rgba(118, 227, 234, 0.15);
+            border-color: #76e3ea;
+        }
+        
+        .delete { 
+            color: var(--color-danger-fg);
+            background-color: rgba(248, 81, 73, 0.15);
+            border-color: var(--color-danger-fg);
+        }
+
+        pre {
+            padding: 16px;
+            margin: 16px 0;
+            overflow: auto;
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            font-size: 13px;
+            line-height: 1.45;
+            background-color: var(--color-canvas-default);
+            border-radius: 6px;
+            border: 1px solid var(--color-border-default);
+        }
+
+        code {
+            padding: 0.2em 0.4em;
+            margin: 0;
+            font-size: 85%;
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            background-color: var(--color-canvas-subtle);
+            border-radius: 6px;
+        }
+
+        table {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            overflow: auto;
+            margin: 16px 0;
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 6px 13px;
+            border: 1px solid var(--color-border-default);
+        }
+
+        th {
+            font-weight: 600;
+            background-color: var(--color-canvas-subtle);
+        }
+
+        tr {
+            background-color: var(--color-canvas-default);
+            border-top: 1px solid var(--color-border-muted);
+        }
+
+        tr:nth-child(2n) {
+            background-color: var(--color-canvas-subtle);
+        }
+
+        .uri-template {
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            color: var(--color-accent-fg);
+        }
+
+        .param-required {
+            color: var(--color-danger-fg);
+            font-weight: 600;
+        }
+
+        .param-optional {
+            color: var(--color-attention-fg);
+        }
+
+        .description {
+            color: var(--color-fg-muted);
+            margin: 8px 0 16px;
+        }
+
+        blockquote {
+            padding: 0 1em;
+            color: var(--color-fg-muted);
+            border-left: 0.25em solid var(--color-border-default);
+            margin: 16px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>SZ10G21 - REST API Extension</h1>
+
+    <section id="overview">
+        <h2>Overview</h2>
+        <p>This extension adds support for managing coursework assignments and student submissions. The new endpoints follow REST principles and integrate with the existing module and delivery resources.</p>
+        
+        <h3>Key Features</h3>
+        <ul>
+            <li>Creation and management of coursework assignments for module deliveries</li>
+            <li>Support for student submissions with version control</li>
+            <li>Multiple submission attempts per student</li>
+            <li>Submission deadlines and late submission handling</li>
+            <li>Assignment feedback and grading</li>
+        </ul>
+    </section>
+
+    <section id="assignments">
+        <h2>Assignments</h2>
+        
+        <h3>Data Model</h3>
+        <table>
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>id</td>
+                <td>string</td>
+                <td>Auto</td>
+                <td>Unique identifier, auto-generated if not provided</td>
+            </tr>
+            <tr>
+                <td>title</td>
+                <td>string</td>
+                <td>Yes</td>
+                <td>Title of the assignment (1-100 characters)</td>
+            </tr>
+            <tr>
+                <td>description</td>
+                <td>string</td>
+                <td>Yes</td>
+                <td>Detailed description of the assignment requirements</td>
+            </tr>
+            <tr>
+                <td>deadline</td>
+                <td>ISO8601</td>
+                <td>Yes</td>
+                <td>Submission deadline in UTC (must be in the future)</td>
+            </tr>
+            <tr>
+                <td>weight</td>
+                <td>integer</td>
+                <td>Yes</td>
+                <td>Percentage weight in module assessment (1-100)</td>
+            </tr>
+            <tr>
+                <td>maxAttempts</td>
+                <td>integer</td>
+                <td>No</td>
+                <td>Maximum allowed submission attempts (default: 1)</td>
+            </tr>
+            <tr>
+                <td>allowLateSubmissions</td>
+                <td>boolean</td>
+                <td>No</td>
+                <td>Whether late submissions are permitted (default: false)</td>
+            </tr>
+            <tr>
+                <td>latePenalty</td>
+                <td>integer</td>
+                <td>No</td>
+                <td>Percentage penalty per day late (0-100, default: 0)</td>
+            </tr>
+            <tr>
+                <td>fileTypes</td>
+                <td>array</td>
+                <td>No</td>
+                <td>Allowed file extensions (e.g., ["pdf", "zip"])</td>
+            </tr>
+            <tr>
+                <td>maxFileSize</td>
+                <td>integer</td>
+                <td>No</td>
+                <td>Maximum submission size in bytes (default: 10485760)</td>
+            </tr>
+            <tr>
+                <td>created</td>
+                <td>ISO8601</td>
+                <td>Auto</td>
+                <td>Timestamp of creation</td>
+            </tr>
+            <tr>
+                <td>modified</td>
+                <td>ISO8601</td>
+                <td>Auto</td>
+                <td>Timestamp of last modification</td>
+            </tr>
+        </table>
+
+        <h3>Content Types</h3>
+        <p>All assignment endpoints support the following content types:</p>
+        <ul>
+            <li><code>application/json</code> (default)</li>
+            <li><code>application/xml</code></li>
+            <li><code>text/html</code></li>
+        </ul>
+
+        <h3>Validation Rules</h3>
+        <table>
+            <tr>
+                <th>Rule</th>
+                <th>Description</th>
+                <th>Error Code</th>
+            </tr>
+            <tr>
+                <td>Deadline Validation</td>
+                <td>Deadline must be at least 24 hours in the future for new assignments</td>
+                <td>422</td>
+            </tr>
+            <tr>
+                <td>Weight Range</td>
+                <td>Weight must be between 1 and 100</td>
+                <td>422</td>
+            </tr>
+            <tr>
+                <td>Title Length</td>
+                <td>Title must be between 1 and 100 characters</td>
+                <td>422</td>
+            </tr>
+            <tr>
+                <td>Description Length</td>
+                <td>Description must not exceed 5000 characters</td>
+                <td>422</td>
+            </tr>
+            <tr>
+                <td>File Types</td>
+                <td>Must be valid MIME types or file extensions</td>
+                <td>422</td>
+            </tr>
+            <tr>
+                <td>Duplicate Prevention</td>
+                <td>Assignment IDs must be unique within a delivery</td>
+                <td>409</td>
+            </tr>
+            <tr>
+                <td>Modification Lock</td>
+                <td>Cannot modify deadline if submissions exist and new deadline would be earlier</td>
+                <td>409</td>
+            </tr>
+            <tr>
+                <td>Deletion Lock</td>
+                <td>Cannot delete assignment if graded submissions exist</td>
+                <td>409</td>
+            </tr>
+        </table>
+
+        <h3>Security Considerations</h3>
+        <ul>
+            <li>Only module leaders and administrators can create, modify, or delete assignments</li>
+            <li>Students can only view assignments for modules they are enrolled in</li>
+            <li>All modifications are logged with user ID and timestamp</li>
+            <li>Batch operations require elevated permissions</li>
+        </ul>
+
+        <h3>Batch Operations</h3>
+        <div class="endpoint">
+            <h4>Batch Create Assignments</h4>
+            <span class="method post">POST</span>
+            <span class="uri-template">/delivery/{crn}/assignments/batch</span>
+            
+            <div class="description">
+                Creates multiple assignments in a single request. All assignments must be valid or none will be created.
+            </div>
+
+            <h4>Request Body</h4>
+            <pre>{
+  "assignments": [
+    {
+      "title": "Coursework 1",
+      "description": "First assignment description",
+      "deadline": "2024-11-22T16:00:00Z",
+      "weight": 25,
+      "maxAttempts": 2
+    },
+    {
+      "title": "Coursework 2",
+      "description": "Second assignment description",
+      "deadline": "2024-12-13T16:00:00Z",
+      "weight": 75,
+      "maxAttempts": 1
+    }
+  ]
+}</pre>
+        </div>
+
+        <h3>Alternative Formats</h3>
+        <div class="endpoint">
+            <h4>XML Example</h4>
+            <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;assignment&gt;
+    &lt;title&gt;API Implementation&lt;/title&gt;
+    &lt;description&gt;Implement a REST API following the specification&lt;/description&gt;
+    &lt;deadline&gt;2024-11-22T16:00:00Z&lt;/deadline&gt;
+    &lt;weight&gt;50&lt;/weight&gt;
+    &lt;maxAttempts&gt;3&lt;/maxAttempts&gt;
+    &lt;allowLateSubmissions&gt;true&lt;/allowLateSubmissions&gt;
+    &lt;latePenalty&gt;5&lt;/latePenalty&gt;
+    &lt;fileTypes&gt;
+        &lt;type&gt;zip&lt;/type&gt;
+        &lt;type&gt;pdf&lt;/type&gt;
+    &lt;/fileTypes&gt;
+&lt;/assignment&gt;</pre>
+
+            <h4>HTML Response Example</h4>
+            <pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;body&gt;
+    &lt;div class="assignment"&gt;
+        &lt;h1&gt;API Implementation&lt;/h1&gt;
+        &lt;p class="description"&gt;Implement a REST API following the specification&lt;/p&gt;
+        &lt;dl&gt;
+            &lt;dt&gt;Deadline&lt;/dt&gt;
+            &lt;dd&gt;2024-11-22 16:00 UTC&lt;/dd&gt;
+            &lt;dt&gt;Weight&lt;/dt&gt;
+            &lt;dd&gt;50%&lt;/dd&gt;
+            &lt;dt&gt;Maximum Attempts&lt;/dt&gt;
+            &lt;dd&gt;3&lt;/dd&gt;
+        &lt;/dl&gt;
+        &lt;ul class="links"&gt;
+            &lt;li&gt;&lt;a href="/delivery/COMP3227/assignments/cw1"&gt;Self&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="/delivery/COMP3227/assignments/cw1/submissions"&gt;Submit&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+        </div>
+
+        <div class="endpoint">
+            <h3>List Assignments</h3>
+            <span class="method get">GET</span>
+            <span class="uri-template">/delivery/{crn}/assignments</span>
+            
+            <div class="description">
+                Retrieves all assignments for a specific module delivery.
+            </div>
+
+            <h4>Parameters</h4>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td class="param-required">crn</td>
+                    <td>string</td>
+                    <td>The Course Reference Number (CRN) of the module delivery</td>
+                </tr>
+            </table>
+
+            <h4>Example Response</h4>
+            <pre>{
+  "assignments": [
+    {
+      "id": "cw1",
+      "title": "API Implementation",
+      "description": "Implement a REST API following the provided specification",
+      "deadline": "2024-11-22T16:00:00Z",
+      "weight": 50,
+      "maxAttempts": 3,
+      "self": "/delivery/COMP3227/assignments/cw1",
+      "submissions": "/delivery/COMP3227/assignments/cw1/submissions",
+      "_links": {
+        "delivery": "/delivery/COMP3227",
+        "submit": "/delivery/COMP3227/assignments/cw1/submissions"
+      }
+    }
+  ],
+  "page": 1,
+  "pageSize": 10,
+  "totalItems": 1
+}</pre>
+        </div>
+
+        <div class="endpoint">
+            <h3>Create Assignment</h3>
+            <span class="method post">POST</span>
+            <span class="uri-template">/delivery/{crn}/assignments</span>
+            
+            <div class="description">
+                Creates a new assignment for a module delivery.
+            </div>
+
+            <h4>Parameters</h4>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td class="param-required">crn</td>
+                    <td>string</td>
+                    <td>The Course Reference Number (CRN) of the module delivery</td>
+                </tr>
+            </table>
+
+            <h4>Request Body Formats</h4>
+            
+            <h5>JSON (application/json)</h5>
+            <pre>{
+  "title": "API Implementation",
+  "description": "Implement a REST API following the provided specification",
+  "deadline": "2024-11-22T16:00:00Z",
+  "weight": 50,
+  "maxAttempts": 3,
+  "allowLateSubmissions": true,
+  "latePenalty": 5
+}</pre>
+
+            <h5>XML (application/xml)</h5>
+            <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;assignment&gt;
+    &lt;title&gt;API Implementation&lt;/title&gt;
+    &lt;description&gt;Implement a REST API following the provided specification&lt;/description&gt;
+    &lt;deadline&gt;2024-11-22T16:00:00Z&lt;/deadline&gt;
+    &lt;weight&gt;50&lt;/weight&gt;
+    &lt;maxAttempts&gt;3&lt;/maxAttempts&gt;
+    &lt;allowLateSubmissions&gt;true&lt;/allowLateSubmissions&gt;
+    &lt;latePenalty&gt;5&lt;/latePenalty&gt;
+&lt;/assignment&gt;</pre>
+
+            <h5>HTML Form (multipart/form-data)</h5>
+            <pre>&lt;form method="post" action="/delivery/COMP3227/assignments"&gt;
+    &lt;div&gt;
+        &lt;label for="title"&gt;Title:&lt;/label&gt;
+        &lt;input type="text" id="title" name="title" value="API Implementation" required&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for="description"&gt;Description:&lt;/label&gt;
+        &lt;textarea id="description" name="description" required&gt;
+            Implement a REST API following the provided specification
+        &lt;/textarea&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for="deadline"&gt;Deadline:&lt;/label&gt;
+        &lt;input type="datetime-local" id="deadline" name="deadline" 
+               value="2024-11-22T16:00" required&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for="weight"&gt;Weight (%):&lt;/label&gt;
+        &lt;input type="number" id="weight" name="weight" value="50" 
+               min="1" max="100" required&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for="maxAttempts"&gt;Maximum Attempts:&lt;/label&gt;
+        &lt;input type="number" id="maxAttempts" name="maxAttempts" 
+               value="3" min="1"&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for="allowLateSubmissions"&gt;Allow Late Submissions:&lt;/label&gt;
+        &lt;input type="checkbox" id="allowLateSubmissions" 
+               name="allowLateSubmissions" checked&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for="latePenalty"&gt;Late Penalty (%):&lt;/label&gt;
+        &lt;input type="number" id="latePenalty" name="latePenalty" 
+               value="5" min="0" max="100"&gt;
+    &lt;/div&gt;
+    &lt;button type="submit"&gt;Create Assignment&lt;/button&gt;
+&lt;/form&gt;</pre>
+
+            <h4>Example Response</h4>
+            <pre>{
+  "id": "cw1",
+  "title": "API Implementation",
+  "description": "Implement a REST API following the provided specification",
+  "deadline": "2024-11-22T16:00:00Z",
+  "weight": 50,
+  "maxAttempts": 3,
+  "allowLateSubmissions": true,
+  "latePenalty": 5,
+  "self": "/delivery/COMP3227/assignments/cw1",
+  "submissions": "/delivery/COMP3227/assignments/cw1/submissions",
+  "_links": {
+    "delivery": "/delivery/COMP3227",
+    "submit": "/delivery/COMP3227/assignments/cw1/submissions"
+  }
+}</pre>
+        
+        </div>
+
+        <div class="endpoint">
+            <h3>Get Assignment Details</h3>
+            <span class="method get">GET</span>
+            <span class="uri-template">/delivery/{crn}/assignments/{assignmentId}</span>
+            
+            <div class="description">
+                Retrieves detailed information about a specific assignment.
+            </div>
+
+            <h4>Parameters</h4>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td class="param-required">crn</td>
+                    <td>string</td>
+                    <td>The Course Reference Number (CRN) of the module delivery</td>
+                </tr>
+                <tr>
+                    <td class="param-required">assignmentId</td>
+                    <td>string</td>
+                    <td>The unique identifier of the assignment</td>
+                </tr>
+            </table>
+
+            <h4>Example Response</h4>
+            <pre>{
+  "id": "cw1",
+  "title": "API Implementation",
+  "description": "Implement a REST API following the provided specification",
+  "deadline": "2024-11-22T16:00:00Z",
+  "weight": 50,
+  "maxAttempts": 3,
+  "allowLateSubmissions": true,
+  "latePenalty": 5,
+  "created": "2024-10-01T09:00:00Z",
+  "modified": "2024-10-01T09:00:00Z",
+  "submissionCount": 12,
+  "self": "/delivery/COMP3227/assignments/cw1",
+  "submissions": "/delivery/COMP3227/assignments/cw1/submissions",
+  "_links": {
+    "delivery": "/delivery/COMP3227",
+    "submit": "/delivery/COMP3227/assignments/cw1/submissions",
+    "update": "/delivery/COMP3227/assignments/cw1",
+    "delete": "/delivery/COMP3227/assignments/cw1"
+  }
+}</pre>
+        </div>
+
+        <div class="endpoint">
+            <h3>Update Assignment</h3>
+            <span class="method put">PUT</span>
+            <span class="uri-template">/delivery/{crn}/assignments/{assignmentId}</span>
+            
+            <div class="description">
+                Updates all fields of an existing assignment. Use PATCH for partial updates.
+            </div>
+
+            <h4>Parameters</h4>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td class="param-required">crn</td>
+                    <td>string</td>
+                    <td>The Course Reference Number (CRN) of the module delivery</td>
+                </tr>
+                <tr>
+                    <td class="param-required">assignmentId</td>
+                    <td>string</td>
+                    <td>The unique identifier of the assignment</td>
+                </tr>
+            </table>
+
+            <h4>Request Body Formats</h4>
+            
+            <h5>JSON (application/json)</h5>
+            <pre>{
+  "title": "Updated API Implementation",
+  "description": "Updated specification for REST API implementation",
+  "deadline": "2024-11-29T16:00:00Z",
+  "weight": 50,
+  "maxAttempts": 3,
+  "allowLateSubmissions": true,
+  "latePenalty": 10
+}</pre>
+
+            <h5>XML (application/xml)</h5>
+            <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;assignment&gt;
+    &lt;title&gt;Updated API Implementation&lt;/title&gt;
+    &lt;description&gt;Updated specification for REST API implementation&lt;/description&gt;
+    &lt;deadline&gt;2024-11-29T16:00:00Z&lt;/deadline&gt;
+    &lt;weight&gt;50&lt;/weight&gt;
+    &lt;maxAttempts&gt;3&lt;/maxAttempts&gt;
+    &lt;allowLateSubmissions&gt;true&lt;/allowLateSubmissions&gt;
+    &lt;latePenalty&gt;10&lt;/latePenalty&gt;
+&lt;/assignment&gt;</pre>
+
+            <h5>HTML Form (multipart/form-data)</h5>
+            <pre>&lt;form method="post" action="/delivery/COMP3227/assignments/cw1"&gt;
+    &lt;input type="hidden" name="_method" value="PUT"&gt;
+    &lt;div&gt;
+        &lt;label for="title"&gt;Title:&lt;/label&gt;
+        &lt;input type="text" id="title" name="title" 
+               value="Updated API Implementation" required&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for="description"&gt;Description:&lt;/label&gt;
+        &lt;textarea id="description" name="description" required&gt;
+            Updated specification for REST API implementation
+        &lt;/textarea&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for="deadline"&gt;Deadline:&lt;/label&gt;
+        &lt;input type="datetime-local" id="deadline" name="deadline" 
+               value="2024-11-29T16:00" required&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for="weight"&gt;Weight (%):&lt;/label&gt;
+        &lt;input type="number" id="weight" name="weight" value="50" 
+               min="1" max="100" required&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for="maxAttempts"&gt;Maximum Attempts:&lt;/label&gt;
+        &lt;input type="number" id="maxAttempts" name="maxAttempts" 
+               value="3" min="1"&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for="allowLateSubmissions"&gt;Allow Late Submissions:&lt;/label&gt;
+        &lt;input type="checkbox" id="allowLateSubmissions" 
+               name="allowLateSubmissions" checked&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for="latePenalty"&gt;Late Penalty (%):&lt;/label&gt;
+        &lt;input type="number" id="latePenalty" name="latePenalty" 
+               value="10" min="0" max="100"&gt;
+    &lt;/div&gt;
+    &lt;button type="submit"&gt;Update Assignment&lt;/button&gt;
+&lt;/form&gt;</pre>
+
+            <h4>Example Response</h4>
+            <pre>{
+  "id": "cw1",
+  "title": "Updated API Implementation",
+  "description": "Updated specification for REST API implementation",
+  "deadline": "2024-11-29T16:00:00Z",
+  "weight": 50,
+  "maxAttempts": 3,
+  "allowLateSubmissions": true,
+  "latePenalty": 10,
+  "created": "2024-10-01T09:00:00Z",
+  "modified": "2024-10-15T14:30:00Z",
+  "submissionCount": 12,
+  "self": "/delivery/COMP3227/assignments/cw1",
+  "submissions": "/delivery/COMP3227/assignments/cw1/submissions",
+  "_links": {
+    "delivery": "/delivery/COMP3227",
+    "submit": "/delivery/COMP3227/assignments/cw1/submissions"
+  }
+}</pre>
+        </div>
+
+        <div class="endpoint">
+            <h3>Partial Update Assignment</h3>
+            <span class="method patch">PATCH</span>
+            <span class="uri-template">/delivery/{crn}/assignments/{assignmentId}</span>
+            
+            <div class="description">
+                Updates specific fields of an existing assignment without affecting others.
+            </div>
+
+            <h4>Parameters</h4>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td class="param-required">crn</td>
+                    <td>string</td>
+                    <td>The Course Reference Number (CRN) of the module delivery</td>
+                </tr>
+                <tr>
+                    <td class="param-required">assignmentId</td>
+                    <td>string</td>
+                    <td>The unique identifier of the assignment</td>
+                </tr>
+            </table>
+
+            <h4>Request Body Formats</h4>
+            
+            <h5>JSON (application/json)</h5>
+            <pre>{
+  "deadline": "2024-11-29T16:00:00Z",
+  "latePenalty": 10
+}</pre>
+
+            <h5>XML (application/xml)</h5>
+            <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;assignment&gt;
+    &lt;deadline&gt;2024-11-29T16:00:00Z&lt;/deadline&gt;
+    &lt;latePenalty&gt;10&lt;/latePenalty&gt;
+&lt;/assignment&gt;</pre>
+
+            <h5>HTML Form (multipart/form-data)</h5>
+            <pre>&lt;form method="post" action="/delivery/COMP3227/assignments/cw1"&gt;
+    &lt;input type="hidden" name="_method" value="PATCH"&gt;
+    &lt;div&gt;
+        &lt;label for="deadline"&gt;Deadline:&lt;/label&gt;
+        &lt;input type="datetime-local" id="deadline" name="deadline" 
+               value="2024-11-29T16:00" required&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for="latePenalty"&gt;Late Penalty (%):&lt;/label&gt;
+        &lt;input type="number" id="latePenalty" name="latePenalty" 
+               value="10" min="0" max="100"&gt;
+    &lt;/div&gt;
+    &lt;button type="submit"&gt;Update Fields&lt;/button&gt;
+&lt;/form&gt;</pre>
+
+            <h4>Example Response</h4>
+            <pre>{
+  "id": "cw1",
+  "title": "API Implementation",
+  "description": "Implement a REST API following the provided specification",
+  "deadline": "2024-11-29T16:00:00Z",
+  "weight": 50,
+  "maxAttempts": 3,
+  "allowLateSubmissions": true,
+  "latePenalty": 10,
+  "created": "2024-10-01T09:00:00Z",
+  "modified": "2024-10-15T14:30:00Z",
+  "submissionCount": 12,
+  "self": "/delivery/COMP3227/assignments/cw1",
+  "submissions": "/delivery/COMP3227/assignments/cw1/submissions",
+  "_links": {
+    "delivery": "/delivery/COMP3227",
+    "submit": "/delivery/COMP3227/assignments/cw1/submissions"
+  }
+}</pre>
+        </div>
+
+        <div class="endpoint">
+            <h3>Delete Assignment</h3>
+            <span class="method delete">DELETE</span>
+            <span class="uri-template">/delivery/{crn}/assignments/{assignmentId}</span>
+            
+            <div class="description">
+                Permanently deletes an assignment and all associated submissions.
+            </div>
+
+            <h4>Parameters</h4>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td class="param-required">crn</td>
+                    <td>string</td>
+                    <td>The Course Reference Number (CRN) of the module delivery</td>
+                </tr>
+                <tr>
+                    <td class="param-required">assignmentId</td>
+                    <td>string</td>
+                    <td>The unique identifier of the assignment</td>
+                </tr>
+            </table>
+
+            <h4>Response</h4>
+            <p>Returns HTTP 204 No Content on successful deletion.</p>
+        </div>
+
+        <div class="endpoint">
+            <h3>Assignment Status Codes</h3>
+            <div class="description">
+                The following status codes may be returned by assignment endpoints:
+            </div>
+
+            <table>
+                <tr>
+                    <th>Code</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>200 OK</td>
+                    <td>Successful GET or PATCH request</td>
+                </tr>
+                <tr>
+                    <td>201 Created</td>
+                    <td>Assignment successfully created</td>
+                </tr>
+                <tr>
+                    <td>204 No Content</td>
+                    <td>Assignment successfully deleted</td>
+                </tr>
+                <tr>
+                    <td>400 Bad Request</td>
+                    <td>Invalid request body or parameters</td>
+                </tr>
+                <tr>
+                    <td>403 Forbidden</td>
+                    <td>Insufficient permissions to modify assignment</td>
+                </tr>
+                <tr>
+                    <td>404 Not Found</td>
+                    <td>Assignment or delivery not found</td>
+                </tr>
+                <tr>
+                    <td>409 Conflict</td>
+                    <td>Assignment already exists or cannot be modified due to existing submissions</td>
+                </tr>
+                <tr>
+                    <td>422 Unprocessable Entity</td>
+                    <td>Valid request body but business rules violated (e.g., deadline in past)</td>
+                </tr>
+            </table>
+        </div>
+    </section>
+    <section id="submissions">
+        <h2>Submissions</h2>
+        
+        <h3>Data Model</h3>
+        <table>
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>id</td>
+                <td>string</td>
+                <td>Auto</td>
+                <td>Unique submission identifier</td>
+            </tr>
+            <tr>
+                <td>student</td>
+                <td>string</td>
+                <td>Auto</td>
+                <td>URI of submitting student</td>
+            </tr>
+            <tr>
+                <td>assignment</td>
+                <td>string</td>
+                <td>Auto</td>
+                <td>URI of the assignment</td>
+            </tr>
+            <tr>
+                <td>version</td>
+                <td>integer</td>
+                <td>Auto</td>
+                <td>Submission version number (1-based)</td>
+            </tr>
+            <tr>
+                <td>files</td>
+                <td>array</td>
+                <td>Yes</td>
+                <td>Array of submitted file objects</td>
+            </tr>
+            <tr>
+                <td>submittedAt</td>
+                <td>ISO8601</td>
+                <td>Auto</td>
+                <td>Timestamp of submission</td>
+            </tr>
+            <tr>
+                <td>status</td>
+                <td>string</td>
+                <td>Auto</td>
+                <td>One of: draft, submitted, late, graded</td>
+            </tr>
+            <tr>
+                <td>grade</td>
+                <td>object</td>
+                <td>No</td>
+                <td>Grade details when status is graded</td>
+            </tr>
+            <tr>
+                <td>feedback</td>
+                <td>string</td>
+                <td>No</td>
+                <td>Feedback from grader</td>
+            </tr>
+            <tr>
+                <td>latePenalty</td>
+                <td>integer</td>
+                <td>Auto</td>
+                <td>Applied penalty percentage if late</td>
+            </tr>
+        </table>
+
+        <div class="endpoint">
+            <h3>List Submissions</h3>
+            <span class="method get">GET</span>
+            <span class="uri-template">/delivery/{crn}/assignments/{assignmentId}/submissions</span>
+            
+            <div class="description">
+                Retrieves all submissions for an assignment. Results are paginated and can be filtered.
+            </div>
+
+            <h4>Parameters</h4>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>In</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td class="param-required">crn</td>
+                    <td>string</td>
+                    <td>path</td>
+                    <td>Course Reference Number</td>
+                </tr>
+                <tr>
+                    <td class="param-required">assignmentId</td>
+                    <td>string</td>
+                    <td>path</td>
+                    <td>Assignment identifier</td>
+                </tr>
+                <tr>
+                    <td class="param-optional">status</td>
+                    <td>string</td>
+                    <td>query</td>
+                    <td>Filter by status</td>
+                </tr>
+                <tr>
+                    <td class="param-optional">student</td>
+                    <td>string</td>
+                    <td>query</td>
+                    <td>Filter by student username</td>
+                </tr>
+                <tr>
+                    <td class="param-optional">page</td>
+                    <td>integer</td>
+                    <td>query</td>
+                    <td>Page number (default: 1)</td>
+                </tr>
+                <tr>
+                    <td class="param-optional">limit</td>
+                    <td>integer</td>
+                    <td>query</td>
+                    <td>Items per page (default: 20, max: 100)</td>
+                </tr>
+            </table>
+
+            <h4>Response Formats</h4>
+            
+            <h5>JSON (application/json)</h5>
+            <pre>{
+  "submissions": [
+    {
+      "id": "sub123",
+      "student": "/student/sz10g21",
+      "assignment": "/delivery/COMP3227/assignments/cw1",
+      "version": 1,
+      "files": [
+        {
+          "name": "report.pdf",
+          "size": 2097152,
+          "mimeType": "application/pdf",
+          "hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "url": "/delivery/COMP3227/assignments/cw1/submissions/sub123/files/report.pdf"
+        }
+      ],
+      "submittedAt": "2024-11-20T14:30:00Z",
+      "status": "submitted",
+      "self": "/delivery/COMP3227/assignments/cw1/submissions/sub123",
+      "_links": {
+        "assignment": "/delivery/COMP3227/assignments/cw1",
+        "student": "/student/sz10g21",
+        "files": "/delivery/COMP3227/assignments/cw1/submissions/sub123/files"
+      }
+    }
+  ],
+  "page": 1,
+  "pageSize": 20,
+  "totalItems": 1,
+  "_links": {
+    "self": "/delivery/COMP3227/assignments/cw1/submissions?page=1",
+    "first": "/delivery/COMP3227/assignments/cw1/submissions?page=1",
+    "last": "/delivery/COMP3227/assignments/cw1/submissions?page=1"
+  }
+}</pre>
+
+            <h5>XML (application/xml)</h5>
+            <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;submissions&gt;
+    &lt;submission&gt;
+        &lt;id&gt;sub123&lt;/id&gt;
+        &lt;student href="/student/sz10g21" /&gt;
+        &lt;assignment href="/delivery/COMP3227/assignments/cw1" /&gt;
+        &lt;version&gt;1&lt;/version&gt;
+        &lt;files&gt;
+            &lt;file&gt;
+                &lt;name&gt;report.pdf&lt;/name&gt;
+                &lt;size&gt;2097152&lt;/size&gt;
+                &lt;mimeType&gt;application/pdf&lt;/mimeType&gt;
+                &lt;hash algorithm="sha256"&gt;
+                    e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                &lt;/hash&gt;
+                &lt;url&gt;
+                    /delivery/COMP3227/assignments/cw1/submissions/sub123/files/report.pdf
+                &lt;/url&gt;
+            &lt;/file&gt;
+        &lt;/files&gt;
+        &lt;submittedAt&gt;2024-11-20T14:30:00Z&lt;/submittedAt&gt;
+        &lt;status&gt;submitted&lt;/status&gt;
+        &lt;self&gt;/delivery/COMP3227/assignments/cw1/submissions/sub123&lt;/self&gt;
+    &lt;/submission&gt;
+    &lt;page&gt;1&lt;/page&gt;
+    &lt;pageSize&gt;20&lt;/pageSize&gt;
+    &lt;totalItems&gt;1&lt;/totalItems&gt;
+&lt;/submissions&gt;</pre>
+
+            <h5>HTML (text/html)</h5>
+            <pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;body&gt;
+    &lt;div class="submissions"&gt;
+        &lt;div class="submission"&gt;
+            &lt;h2&gt;Submission sub123&lt;/h2&gt;
+            &lt;dl&gt;
+                &lt;dt&gt;Student&lt;/dt&gt;
+                &lt;dd&gt;&lt;a href="/student/sz10g21"&gt;sz10g21&lt;/a&gt;&lt;/dd&gt;
+                
+                &lt;dt&gt;Assignment&lt;/dt&gt;
+                &lt;dd&gt;&lt;a href="/delivery/COMP3227/assignments/cw1"&gt;CW1&lt;/a&gt;&lt;/dd&gt;
+                
+                &lt;dt&gt;Version&lt;/dt&gt;
+                &lt;dd&gt;1&lt;/dd&gt;
+                
+                &lt;dt&gt;Submitted&lt;/dt&gt;
+                &lt;dd&gt;20 November 2024, 14:30 UTC&lt;/dd&gt;
+                
+                &lt;dt&gt;Status&lt;/dt&gt;
+                &lt;dd&gt;Submitted&lt;/dd&gt;
+            &lt;/dl&gt;
+            
+            &lt;h3&gt;Files&lt;/h3&gt;
+            &lt;ul&gt;
+                &lt;li&gt;
+                    &lt;a href="/delivery/COMP3227/assignments/cw1/submissions/sub123/files/report.pdf"&gt;
+                        report.pdf (2.0 MB)
+                    &lt;/a&gt;
+                &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;
+        
+        &lt;div class="pagination"&gt;
+            &lt;p&gt;Page 1 of 1 (1 item)&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+        </div>
+</body>
+</html>
