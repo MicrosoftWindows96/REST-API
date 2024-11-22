@@ -165,14 +165,14 @@ Content Types:
 }
 
 // XML
-"data": "\n\n  <?xml version="1.0" encoding="utf-8" standalone="no"?>
+"data": "<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <module>
   <code>33381836</code>
   <title>Test Module</title>
   <description>Testing POST method</description>
   <self>/module/33381836</self>
   <delivery>/delivery/050198JSON</delivery>
-</module>\n"
+</module>"
 ```
 
 Implementation of self-descriptive messaging is evident in these responses. The ```self``` links present in the examples above correctly point to the resources themselves to help client navigation, an example of Hypermedia as the Engine of Application State (HATEOAS), a vital REST constraint. Servers can store data in whatever format they choose internally and clients can request the data in whatever format best suits their needs (so long as it's offered by the server), decoupling client and server to scale independently (unless content type support changes).
@@ -306,6 +306,7 @@ Suggested Student Restructuring:
 GET /student/          // List all students
 POST /student/         // Create new student
 GET /student/{id}      // Get specific student
+PATCH /student/{id}    // Partially update specific student
 PUT /student/{id}      // Update specific student
 DELETE /student/{id}   // Delete specific student
 ```

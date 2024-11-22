@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SZ10G21 - REST API Test Suite</title>
+    <style>
+        :root {
+            --color-canvas-default: #0d1117;
+            --color-canvas-subtle: #161b22;
+            --color-border-default: #30363d;
+            --color-border-muted: #21262d;
+            --color-neutral-muted: rgba(110,118,129,0.4);
+            --color-accent-fg: #7ee787;
+            --color-success-fg: #7ee787;
+            --color-danger-fg: #f85149;
+            --color-done-fg: #a371f7;
+            --color-attention-fg: #d29922;
+            --color-fg-default: #c9d1d9;
+            --color-fg-muted: #8b949e;
+            --color-fg-subtle: #6e7681;
+            --color-header-bg: #0d1117;
+            --color-btn-bg: #21262d;
+            --color-btn-hover-bg: #30363d;
+            --color-terminal-bg: #0c0c0c;
+            --color-options-fg: #58a6ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--color-fg-default);
+            background-color: var(--color-canvas-default);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: minmax(300px, 400px) 1fr;
+            height: 100vh;
+            max-height: 100vh;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .test-panel, .terminal-panel {
+            height: 100vh;
+            max-height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .terminal-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-output {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 16px;
+            white-space: pre-wrap;
+        }
+
+        .test-panel h1 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--color-border-muted);
+            color: var(--color-fg-default);
+        }
+
+        .test-group {
+            margin-bottom: 16px;
+        }
+
+        .test-group-header {
+            padding: 8px;
+            background: var(--color-canvas-default);
+            border: 1px solid var(--color-border-default);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .test-group-header h2 {
+            font-size: 14px;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .test-case {
+            padding: 8px;
+            margin: 4px 0;
+            border: 1px solid var(--color-border-muted);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .test-case:hover {
+            border-color: var(--color-accent-fg);
+            background: var(--color-canvas-default);
+        }
+
+        .method {
+            display: inline-block;
+            padding: 2px 6px;
+            margin-right: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 2em;
+            border: 1px solid transparent;
+        }
+
+        .get { 
+            color: var(--color-success-fg);
+            background-color: rgba(46, 160, 67, 0.15);
+            border-color: var(--color-success-fg);
+        }
+        
+        .post { 
+            color: var(--color-done-fg);
+            background-color: rgba(163, 113, 247, 0.15);
+            border-color: var(--color-done-fg);
+        }
+        
+        .put { 
+            color: var(--color-attention-fg);
+            background-color: rgba(210, 153, 34, 0.15);
+            border-color: var(--color-attention-fg);
+        }
+
+        .patch { 
+            color: #76e3ea;
+            background-color: rgba(118, 227, 234, 0.15);
+            border-color: #76e3ea;
+        }
+        
+        .delete { 
+            color: var(--color-danger-fg);
+            background-color: rgba(248, 81, 73, 0.15);
+            border-color: var(--color-danger-fg);
+        }
+        
+        .options {
+            color: var(--color-options-fg);
+            background-color: rgba(88, 166, 255, 0.15);
+            border-color: var(--color-options-fg);
+        }
+
+        .endpoint {
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            font-size: 12px;
+            color: var(--color-fg-muted);
+            margin-top: 4px;
+        }
+
+        .terminal-panel {
+            background: var(--color-terminal-bg);
+            padding: 16px;
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            font-size: 12px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .terminal-header {
+            position: sticky;
+            top: 0;
+            background: var(--color-terminal-bg);
+            padding: 8px 0;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--color-border-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-title {
+            color: var(--color-accent-fg);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .terminal-controls button {
+            background: transparent;
+            border: 1px solid var(--color-border-default);
+            color: var(--color-fg-default);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .terminal-controls button:hover {
+            border-color: var(--color-accent-fg);
+            color: var(--color-accent-fg);
+        }
+        
+        .terminal-controls button + button {
+            margin-left: 8px;
+        }
+
+        .terminal-output {
+            white-space: pre-wrap;
+            color: var(--color-fg-default);
+        }
+
+        .output-entry {
+            margin-bottom: 16px;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--color-border-muted);
+        }
+
+        .output-entry.success {
+            border-left: 4px solid var(--color-success-fg);
+        }
+
+        .output-entry.error {
+            border-left: 4px solid var(--color-danger-fg);
+        }
+
+        .timestamp {
+            color: var(--color-accent-fg);
+            margin-right: 8px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--color-canvas-subtle);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--color-border-default);
+            border: 3px solid var(--color-canvas-subtle);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--color-border-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Test pane -->
+        <div class="test-panel">
+            <h1>SZ10G21 - REST API Test Suite</h1>
+        <!-- Custom Req -->
+        <div class="test-group">
+            <div class="test-group-header">
+                <h2>Custom Request</h2>
+            </div>
+            <div class="request-builder-container">
+                <style>
+                    .request-builder-container {
+                        padding: 16px;
+                        background: var(--color-canvas-subtle);
+                        border-radius: 6px;
+                        margin-top: 8px;
+                        border: 1px solid var(--color-border-muted);
+                    }
+
+                    .request-builder-grid {
+                        margin-bottom: 16px;
+                        display: grid;
+                        grid-template-columns: 120px 1fr;
+                        gap: 12px;
+                        align-items: center;
+                    }
+
+                    .request-builder-label {
+                        color: var(--color-fg-default);
+                        font-size: 14px;
+                    }
+
+                    .method-buttons, .resource-buttons {
+                        display: flex;
+                        gap: 8px;
+                        margin-bottom: 16px;
+                    }
+
+                    .method-button, .resource-button {
+                        display: inline-block;
+                        padding: 2px 6px;
+                        font-size: 12px;
+                        font-weight: 500;
+                        border-radius: 2em;
+                        border: 1px solid transparent;
+                        cursor: pointer;
+                    }
+
+                    .method-button.get, .resource-button.module { 
+                        color: var(--color-success-fg);
+                        background-color: rgba(46, 160, 67, 0.15);
+                        border-color: var(--color-success-fg);
+                    }
+                    
+                    .method-button.post, .resource-button.delivery { 
+                        color: var(--color-done-fg);
+                        background-color: rgba(163, 113, 247, 0.15);
+                        border-color: var(--color-done-fg);
+                    }
+                    
+                    .method-button.put, .resource-button.student { 
+                        color: var(--color-attention-fg);
+                        background-color: rgba(210, 153, 34, 0.15);
+                        border-color: var(--color-attention-fg);
+                    }
+                    
+                    .method-button.patch { 
+                        color: #76e3ea;
+                        background-color: rgba(118, 227, 234, 0.15);
+                        border-color: #76e3ea;
+                    }
+                    
+                    .method-button.delete { 
+                        color: var(--color-danger-fg);
+                        background-color: rgba(248, 81, 73, 0.15);
+                        border-color: var(--color-danger-fg);
+                    }
+
+                    .method-button:not(.active), .resource-button:not(.active) {
+                        background-color: transparent;
+                    }
+
+                    .fields-container {
+                        background: var(--color-canvas-default);
+                        padding: 16px;
+                        border-radius: 6px;
+                        border: 1px solid var(--color-border-muted);
+                        margin-bottom: 16px;
+                    }
+
+                    .field-grid {
+                        display: grid;
+                        grid-template-columns: 120px 1fr;
+                        gap: 12px;
+                        margin-bottom: 12px;
+                        align-items: start;
+                    }
+
+                    .field-grid:last-child {
+                        margin-bottom: 0;
+                    }
+
+                    .field-label {
+                        padding-top: 6px;
+                        color: var(--color-fg-default);
+                        font-size: 14px;
+                    }
+
+                    .field-input {
+                        background: var(--color-canvas-default);
+                        color: var(--color-fg-default);
+                        border: 1px solid var(--color-border-default);
+                        padding: 6px 12px;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        width: 100%;
+                    }
+
+                    .field-textarea {
+                        background: var(--color-canvas-default);
+                        color: var(--color-fg-default);
+                        border: 1px solid var(--color-border-default);
+                        padding: 6px 12px;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+                        width: 100%;
+                        min-height: 100px;
+                        resize: vertical;
+                    }
+
+                    .field-help {
+                        grid-column: 2;
+                        color: var(--color-fg-muted);
+                        font-size: 12px;
+                        margin-top: 4px;
+                    }
+
+                    .send-button {
+                        width: 100%;
+                        background: var(--color-btn-bg);
+                        color: var(--color-accent-fg);
+                        border: 1px solid var(--color-accent-fg);
+                        padding: 8px 16px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 500;
+                        font-size: 14px;
+                        transition: 0.2s all;
+                    }
+
+                    .send-button:hover {
+                        background: var(--color-btn-hover-bg);
+                    }
+                </style>
+                
+                <div class="resource-buttons">
+                    <button class="resource-button module active" onclick="selectResource('module')">MODULE</button>
+                    <button class="resource-button delivery" onclick="selectResource('delivery')">DELIVERY</button>
+                    <button class="resource-button student" onclick="selectResource('student')">STUDENT</button>
+                </div>
+
+                <div class="method-buttons">
+                    <button class="method-button get active" onclick="selectMethod('GET')">GET</button>
+                    <button class="method-button post" onclick="selectMethod('POST')">POST</button>
+                    <button class="method-button put" onclick="selectMethod('PUT')">PUT</button>
+                    <button class="method-button patch" onclick="selectMethod('PATCH')">PATCH</button>
+                    <button class="method-button delete" onclick="selectMethod('DELETE')">DELETE</button>
+                </div>
+
+                <div id="dynamic-fields" class="fields-container">
+                    <!-- Fields -->
+                </div>
+
+                <button onclick="sendStructuredRequest()" class="send-button">EXECUTE</button>
+            </div>
+        </div>
+
+        <script>
+            const resourceFields = {
+                module: {
+                    GET: [
+                        { name: 'code', label: 'CODE', placeholder: 'COMP3227' }
+                    ],
+                    POST: [
+                        { name: 'code', label: 'CODE', placeholder: 'COMP3227' },
+                        { name: 'title', label: 'TITLE', placeholder: 'Web Architecture' },
+                        { name: 'description', label: 'DESCRIPTION', placeholder: 'The World Wide Web is...', type: 'textarea' }
+                    ],
+                    PUT: [
+                        { name: 'code', label: 'CODE', placeholder: 'COMP3227' },
+                        { name: 'title', label: 'TITLE', placeholder: 'Web Architecture' },
+                        { name: 'description', label: 'DESCRIPTION', placeholder: 'The World Wide Web is...', type: 'textarea' }
+                    ],
+                    PATCH: [
+                        { name: 'code', label: 'CODE', placeholder: 'COMP3227' },
+                        { name: 'title', label: 'TITLE', placeholder: 'Web Architecture' },
+                        { name: 'description', label: 'DESCRIPTION', placeholder: 'The World Wide Web is...', type: 'textarea' }
+                    ],
+                    DELETE: [
+                        { name: 'code', label: 'CODE', placeholder: 'COMP3227' }
+                    ]
+                },
+                delivery: {
+                    GET: [
+                        { name: 'crn', label: 'CRN', placeholder: '12345' }
+                    ],
+                    POST: [
+                        { name: 'crn', label: 'CRN', placeholder: '12345' },
+                        { name: 'module', label: 'CODE', placeholder: 'COMP3227' },
+                        { name: 'academicYear', label: 'YEAR', placeholder: '2425' },
+                        { name: 'moduleLeader', label: 'LEADER', placeholder: 'Shaho Zagrosi' }
+                    ],
+                    PUT: [
+                        { name: 'crn', label: 'CRN', placeholder: '12345' },
+                        { name: 'module', label: 'CODE', placeholder: 'COMP3227' },
+                        { name: 'academicYear', label: 'YEAR', placeholder: '2425' },
+                        { name: 'moduleLeader', label: 'LEADER', placeholder: 'Shaho Zagrosi' }
+                    ],
+                    PATCH: [
+                        { name: 'crn', label: 'CRN', placeholder: '12345' },
+                        { name: 'module', label: 'CODE', placeholder: 'COMP3227' },
+                        { name: 'academicYear', label: 'YEAR', placeholder: '2425' },
+                        { name: 'moduleLeader', label: 'LEADER', placeholder: 'Shaho Zagrosi' }
+                    ],
+                    DELETE: [
+                        { name: 'crn', label: 'CRN', placeholder: '12345' }
+                    ]
+                },
+                student: {
+                    GET: [
+                        { name: 'username', label: 'USERNAME', placeholder: 'sz10g21' }
+                    ],
+                    POST: [
+                        { name: 'username', label: 'USERNAME', placeholder: 'sz10g21' },
+                        { name: 'firstnames', label: 'FIRST NAME(S)', placeholder: 'Shaho' },
+                        { name: 'lastname', label: 'LAST NAME', placeholder: 'Zagrosi' },
+                        { name: 'part', label: 'PART', placeholder: '3' },
+                        { name: 'enrolledin', label: 'ENROLLED IN', placeholder: '12345,67890'}
+                    ],
+                    PUT: [
+                        { name: 'username', label: 'USERNAME', placeholder: 'sz10g21' },
+                        { name: 'firstnames', label: 'FIRST NAME(S)', placeholder: 'Shaho' },
+                        { name: 'lastname', label: 'LAST NAME', placeholder: 'Zagrosi' },
+                        { name: 'part', label: 'PART', placeholder: '3' },
+                        { name: 'enrolledin', label: 'ENROLLED IN', placeholder: '12345,67890'}
+                    ],
+                    PATCH: [
+                        { name: 'username', label: 'USERNAME', placeholder: 'sz10g21' },
+                        { name: 'firstnames', label: 'FIRST NAME(S)', placeholder: 'Shaho' },
+                        { name: 'lastname', label: 'LAST NAME', placeholder: 'Zagrosi' },
+                        { name: 'part', label: 'PART', placeholder: '3' },
+                        { name: 'enrolledin', label: 'ENROLLED IN', placeholder: '12345,67890'}
+                    ],
+                    DELETE: [
+                        { name: 'username', label: 'USERNAME', placeholder: 'sz10g21' }
+                    ]
+                }
+            };
+
+            function selectResource(resource) {
+                document.querySelectorAll('.resource-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`.resource-button.${resource.toLowerCase()}`).classList.add('active');
+                updateRequestFields();
+            }
+
+            function getSelectedResource() {
+                const activeButton = document.querySelector('.resource-button.active');
+                return activeButton ? activeButton.textContent.toLowerCase() : 'module';
+            }
+            
+            function selectMethod(method) {
+                document.querySelectorAll('.method-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`.method-button.${method.toLowerCase()}`).classList.add('active');
+                updateRequestFields();
+            }
+
+            function getSelectedMethod() {
+                const activeButton = document.querySelector('.method-button.active');
+                return activeButton ? activeButton.textContent : 'GET';
+            }
+
+            function updateRequestFields() {
+                const resourceType = getSelectedResource();
+                const method = getSelectedMethod();
+                const container = document.getElementById('dynamic-fields');
+                container.innerHTML = '';
+
+                const fields = resourceFields[resourceType][method] || [];
+                
+                fields.forEach(field => {
+                    const fieldContainer = document.createElement('div');
+                    fieldContainer.className = 'field-grid';
+
+                    const label = document.createElement('label');
+                    label.textContent = field.label;
+                    label.className = 'field-label';
+
+                    if (field.type === 'textarea') {
+                        const textarea = document.createElement('textarea');
+                        textarea.id = `field-${field.name}`;
+                        textarea.placeholder = field.placeholder;
+                        textarea.className = 'field-textarea';
+                        textarea.rows = 4;
+                        fieldContainer.appendChild(label);
+                        fieldContainer.appendChild(textarea);
+                    } else {
+                        const input = document.createElement('input');
+                        input.id = `field-${field.name}`;
+                        input.type = 'text';
+                        input.placeholder = field.placeholder;
+                        input.className = 'field-input';
+                        fieldContainer.appendChild(label);
+                        fieldContainer.appendChild(input);
+                    }
+
+                    if (field.help) {
+                        const helpText = document.createElement('div');
+                        helpText.textContent = field.help;
+                        helpText.className = 'field-help';
+                        container.appendChild(fieldContainer);
+                        container.appendChild(helpText);
+                    } else {
+                        container.appendChild(fieldContainer);
+                    }
+                });
+            }
+
+            function getEndpoint() {
+                const resourceType = getSelectedResource();
+                const method = getSelectedMethod();
+                let endpoint = `/${resourceType}`;
+
+                if (method !== 'POST') {
+                    const idField = resourceFields[resourceType][method][0];
+                    const idValue = document.getElementById(`field-${idField.name}`).value;
+                    if (idValue) {
+                        endpoint += `/${idValue}`;
+                    }
+                }
+
+                return endpoint;
+            }
+
+            function parseEnrolledIn(value) {
+                if (!value) return [];
+                return value.split(',').map(crn => `/delivery/${crn.trim()}`).filter(path => path !== '/delivery/');
+            }
+
+            function buildRequestBody() {
+                const resourceType = getSelectedResource();
+                const method = getSelectedMethod();
+                const fields = resourceFields[resourceType][method] || [];
+                const body = {};
+
+                fields.forEach(field => {
+                    const value = document.getElementById(`field-${field.name}`).value;
+                    if (value) {
+                        const fieldName = field.name === 'academicYear' ? 'AcademicYear' :
+                                        field.name === 'moduleLeader' ? 'ModuleLeader' :
+                                        field.name === 'firstnames' ? 'firstnames' :
+                                        field.name === 'lastname' ? 'lastname' :
+                                        field.name === 'username' ? 'username' :
+                                        field.name === 'part' ? 'part' :
+                                        field.name === 'enrolledin' ? 'enrolledin' :
+                                        field.name.charAt(0).toUpperCase() + field.name.slice(1);
+                        
+                        body[fieldName] = field.name === 'enrolledin' ? parseEnrolledIn(value) : value;
+                    }
+                });
+
+                return body;
+            }
+
+            async function sendStructuredRequest() {
+                const method = getSelectedMethod();
+                const endpoint = getEndpoint();
+
+                if (!endpoint) {
+                    appendToTerminal('Error: Endpoint is required', false);
+                    return;
+                }
+
+                const options = {
+                    method,
+                    headers: {
+                        'Authorization': `Bearer ${AUTH_TOKEN}`,
+                        'Accept': 'application/json'
+                    }
+                };
+
+                if (method !== 'GET' && method !== 'DELETE') {
+                    const body = buildRequestBody();
+                    options.body = JSON.stringify(body);
+                    options.headers['Content-Type'] = 'application/json';
+                }
+
+                try {
+                    appendToTerminal(`Sending ${method} request to ${endpoint}`);
+                    const response = await fetch(API_BASE_URL + endpoint, options);
+                    const contentType = response.headers.get('content-type');
+                    
+                    let responseData;
+                    try {
+                        responseData = await response.json();
+                    } catch {
+                        responseData = await response.text();
+                    }
+
+                    if (response.ok) {
+                        const path = endpoint.replace(/\/?$/, '');
+                        
+                        if (method === 'DELETE') {
+                            window.resourceTree.removeNode(path);
+                        } else if (responseData) {
+                            if (Array.isArray(responseData)) {
+                                responseData.forEach(item => {
+                                    if (item.self) {
+                                        const itemPath = item.self.trim();
+                                        window.resourceTree.updateNode(itemPath, item);
+                                        
+                                        Object.entries(item).forEach(([key, value]) => {
+                                            if (Array.isArray(value)) {
+                                                value.forEach(ref => {
+                                                    if (typeof ref === 'string' && ref.startsWith('/')) {
+                                                        window.resourceTree.updateNode(ref.trim(), { [key === 'delivery' ? 'module' : 'delivery']: itemPath });
+                                                    }
+                                                });
+                                            } else if (typeof value === 'string' && value.startsWith('/')) {
+                                                window.resourceTree.updateNode(value.trim(), { parent: itemPath });
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                const selfPath = responseData.self || path;
+                                window.resourceTree.updateNode(selfPath, responseData);
+
+                                Object.entries(responseData).forEach(([key, value]) => {
+                                    if (Array.isArray(value)) {
+                                        value.forEach(ref => {
+                                            if (typeof ref === 'string' && ref.startsWith('/')) {
+                                                window.resourceTree.updateNode(ref.trim(), { [key === 'delivery' ? 'module' : 'delivery']: selfPath });
+                                            }
+                                        });
+                                    } else if (typeof value === 'string' && value.startsWith('/')) {
+                                        window.resourceTree.updateNode(value.trim(), { parent: selfPath });
+                                        window.resourceTree.updateNode(selfPath, { [key]: value.trim() });
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                    appendToTerminal(
+                        `Status: ${response.status} ${response.statusText}\n` +
+                        `Content-Type: ${contentType}\n` +
+                        `Response:\n${JSON.stringify(responseData, null, 2)}`,
+                        response.ok
+                    );
+                } catch (error) {
+                    appendToTerminal(`Error: ${error.message}`, false);
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                updateRequestFields();
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                    sendStructuredRequest();
+                }
+            });
+        </script>
+        
+            <div id="test-groups">
+                <!-- P'late tests -->
+            </div>
+        </div>
+
+        <!-- Terminal pane -->
+        <div class="terminal-panel">
+            <div class="terminal-header">
+                <span class="terminal-title">Test Output</span>
+                <div class="terminal-controls">
+                    <button onclick="exportLog()">Export Log</button>
+                    <button onclick="clearTerminal()">Clear</button>
+                    <button onclick="runAllTests()">Run All Tests</button>
+                </div>
+            </div>
+            <div id="terminal-output" class="terminal-output">
+                <!-- P'late terminal -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://comp3227.soton.ac.uk';
+        const AUTH_TOKEN = 'NICE_TOKEN';
+
+        // Test config
+        const tests = [
+            {
+                name: 'Options Operations',
+                tests: [
+                {
+                        name: 'Module Options',
+                        method: 'OPTIONS',
+                        endpoint: '/module/',
+                        acceptTypes: ['application/json'],
+                        description: 'Check allowed methods'
+                    },
+                    {
+                        name: 'Delivery Options',
+                        method: 'OPTIONS',
+                        endpoint: '/delivery/',
+                        acceptTypes: ['application/json'],
+                        description: 'Check allowed methods'
+                    },
+                    {
+                        name: 'Student Options',
+                        method: 'OPTIONS',
+                        endpoint: '/student/',
+                        acceptTypes: ['application/json'],
+                        description: 'Check allowed methods'
+                    },
+                    {
+                        name: 'Students Options',
+                        method: 'OPTIONS',
+                        endpoint: '/students',
+                        acceptTypes: ['application/json'],
+                        description: 'Check allowed students methods'
+                    }
+                ]
+            },
+            {
+                name: 'Module Operations',
+                tests: [
+                    {
+                        name: 'List All Modules',
+                        method: 'GET',
+                        endpoint: '/module/',
+                        acceptTypes: [
+                            'application/json',
+                            'text/html',
+                            'application/xml'
+                        ],
+                        description: 'Get a list of all modules'
+                    },
+                    {
+                        name: 'Create Module',
+                        method: 'POST',
+                        endpoint: '/module/',
+                        acceptTypes: ['application/json'],
+                        description: 'Create a new module',
+                        body: {
+                            Code: "33381836",
+                            Title: "Test Module",
+                            Description: "Testing POST method"
+                        }
+                    },
+                    {
+                        name: 'View Module',
+                        method: 'GET',
+                        endpoint: '/module/33381836',
+                        acceptTypes: [
+                            'application/json',
+                            'text/html',
+                            'application/xml'
+                        ],
+                        description: 'Get details of a specific module'
+                    },
+                    {
+                        name: 'Fetch Students Enrolled',
+                        method: 'GET',
+                        endpoint: '/students',
+                        acceptTypes: [
+                            'application/json',
+                            'text/html',
+                            'application/xml'
+                        ],
+                        description: 'Get list of students enrolled'
+                    }
+                ]
+            },
+            {
+                name: 'Delivery Management',
+                tests: [
+                    {
+                        name: 'Create Initial Delivery (JSON)',
+                        method: 'POST',
+                        endpoint: '/delivery',
+                        acceptTypes: ['application/json'],
+                        description: 'Create new delivery for testing',
+                        body: {
+                            CRN: "050198JSON",
+                            Module: "",
+                            AcademicYear: "2526",
+                            ModuleLeader: "Shaho Zagrosi",
+                            module: "/module/33381836"
+                        }
+                    },
+                    {
+                        name: 'Create Delivery (XML)',
+                        method: 'POST',
+                        endpoint: '/delivery',
+                        acceptTypes: ['application/xml'],
+                        description: 'Create new delivery for testing',
+                        body: {
+                            CRN: "050198XML",
+                            Module: "",
+                            AcademicYear: "2526",
+                            ModuleLeader: "Shaho Zagrosi",
+                            module: "/module/33381836"
+                        }
+                    },
+                    {
+                        name: 'Create Delivery (HTML)',
+                        method: 'POST',
+                        endpoint: '/delivery',
+                        acceptTypes: ['text/html'],
+                        description: 'Create new delivery for testing',
+                        body: {
+                            CRN: "050198HTML",
+                            Module: "",
+                            AcademicYear: "2526",
+                            ModuleLeader: "Shaho Zagrosi",
+                            module: "/module/33381836"
+                        }
+                    },
+                    {
+                        name: 'Verify Delivery Creation',
+                        method: 'GET',
+                        endpoint: '/module/33381836',
+                        acceptTypes: [
+                            'application/json',
+                            'text/html',
+                            'application/xml'
+                        ],
+                        description: 'Check if delivery was added to module'
+                    },
+                    {
+                        name: 'View New Delivery',
+                        method: 'GET',
+                        endpoint: '/delivery/050198JSON',
+                        acceptTypes: [
+                            'application/json',
+                            'text/html',
+                            'application/xml'
+                        ],
+                        description: 'Verify delivery details'
+                    },
+                    {
+                        name: 'Create Student Record',
+                        method: 'POST',
+                        endpoint: '/student',
+                        acceptTypes: ['application/json'],
+                        description: 'Create new student record',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: {
+                            username: "sz10g21",
+                            firstnames: "Shaho",
+                            lastname: "Zagrosi",
+                            part: "3",
+                            enrolledin: ["/delivery/050198JSON"],
+                            self: "/student/sz10g21"
+                        }
+                    },
+                    {
+                        name: 'View Student Record',
+                        method: 'GET',
+                        endpoint: '/student/sz10g21',
+                        acceptTypes: [
+                            'application/json',
+                            'text/html',
+                            'application/xml'
+                        ],
+                        description: 'Verify student creation'
+                    },
+                    {
+                        name: 'View Updated Delivery',
+                        method: 'GET',
+                        endpoint: '/delivery/050198JSON',
+                        acceptTypes: [
+                            'application/json',
+                            'text/html',
+                            'application/xml'
+                        ],
+                        description: 'Verify student appears in delivery'
+                    },
+                    {
+                        name: 'Link Student to Delivery',
+                        method: 'PUT',
+                        endpoint: '/delivery/050198JSON',
+                        acceptTypes: ['application/json'],
+                        description: 'Add student to delivery',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: {
+                            CRN: "050198",
+                            AcademicYear: "2526",
+                            ModuleLeader: "Shaho Zagrosi",
+                            self: "/delivery/050198JSON",
+                            module: "/module/33381836",
+                            student: ["/student/sz10g21"]
+                        }
+                    },
+                    { 
+                        name: 'Patch Student Enrolled',
+                        method: 'PATCH',
+                        endpoint: '/delivery/050198JSON',
+                        acceptTypes: ['application/json'],
+                        description: 'Update student only',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: {
+                            student: [""]
+                        }
+                    },
+                    {
+                        name: 'Patch Student Part',
+                        method: 'PATCH',
+                        endpoint: '/student/sz10g21',
+                        acceptTypes: ['application/json'],
+                        description: 'Update student part number only',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: {
+                            Part: "4"
+                        }
+                    },
+                    {
+                        name: 'Patch Delivery Leader',
+                        method: 'PATCH',
+                        endpoint: '/delivery/050198JSON',
+                        acceptTypes: ['application/json'],
+                        description: 'Update Leader only',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: {
+                            ModuleLeader: "Zagrosi Shaho"
+                        }
+                    }
+                    ]
+            },
+            {
+                name: 'Cleanup Operations',
+                tests: [
+                {
+                        name: 'Delete Student Record',
+                        method: 'DELETE',
+                        endpoint: '/student/sz10g21',
+                        acceptTypes: ['application/json'],
+                        description: 'Delete student record'
+                    },
+                    {
+                        name: 'Delete JSON Delivery',
+                        method: 'DELETE',
+                        endpoint: '/delivery/050198JSON',
+                        acceptTypes: ['application/json'],
+                        description: 'Delete new delivery'
+                    },
+                    {
+                        name: 'Delete XML Delivery',
+                        method: 'DELETE',
+                        endpoint: '/delivery/050198XML',
+                        acceptTypes: ['application/json'],
+                        description: 'Delete new delivery'
+                    },
+                    {
+                        name: 'Delete HTML Delivery',
+                        method: 'DELETE',
+                        endpoint: '/delivery/050198HTML',
+                        acceptTypes: ['application/json'],
+                        description: 'Delete new delivery'
+                    },
+                    {
+                        name: 'Delete Module',
+                        method: 'DELETE',
+                        endpoint: '/module/33381836',
+                        acceptTypes: ['application/json'],
+                        description: 'Delete a module'
+                    }
+                ]
+            },
+            {
+                name: 'Invalid Operations (Expecting Errors)',
+                tests: [
+                    {
+                        name: 'View Invalid Module',
+                        method: 'GET',
+                        endpoint: '/module/123456',
+                        acceptTypes: ['application/json'],
+                        description: 'Check invalid module'
+                    },
+                    {
+                        name: 'View Invalid Delivery',
+                        method: 'GET',
+                        endpoint: '/delivery/123456',
+                        acceptTypes: ['application/json'],
+                        description: 'Check invalid delivery'
+                    },
+                    {
+                        name: 'View Invalid Student',
+                        method: 'GET',
+                        endpoint: '/student/123456',
+                        acceptTypes: ['application/json'],
+                        description: 'Check invalid student'
+                    },
+                    {
+                        name: 'Create Invalid Module',
+                        method: 'POST',
+                        endpoint: '/module',
+                        acceptTypes: ['application/json'],
+                        description: 'Create invalid module',
+                        body: {
+                            Code: "33381836",
+                            Description: "Testing POST method"
+                        }
+                    },
+                    {
+                        name: 'Create Invalid Delivery',
+                        method: 'POST',
+                        endpoint: '/delivery',
+                        acceptTypes: ['application/json'],
+                        description: 'Create invalid delivery for testing',
+                        body: {
+                            CRN: "123456",
+                            Module: "",
+                            AcademicYear: "2526",
+                            ModuleLeader: "Shaho Zagrosi",
+                            module: "/module/33381836 "
+                        }
+                    },
+                    {
+                        name: 'Create Invalid Student',
+                        method: 'POST',
+                        endpoint: '/student',
+                        acceptTypes: ['application/json'],
+                        description: 'Create invalid student record',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: {
+                            username: "sz10g21",
+                            firstnames: "Shaho",
+                            lastname: "Zagrosi",
+                            part: "3",
+                            enrolledin: ["/delivery/123456"],
+                            self: "/student/sz10g21"
+                        }
+                    },
+                    {
+                        name: 'Update Invalid Student',
+                        method: 'PATCH',
+                        endpoint: '/student/sz10g21',
+                        acceptTypes: ['application/json'],
+                        description: 'Update student with invalid data',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: {
+                            Part: "invalid"
+                        }
+                    },
+                    {
+                        name: 'Update Invalid Delivery',
+                        method: 'PATCH',
+                        endpoint: '/delivery/050198',
+                        acceptTypes: ['application/json'],
+                        description: 'Update delivery with invalid data',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: {
+                            AcademicYear: "invalid"
+                        }
+                    },
+                    {
+                        name: 'Delete Invalid Student',
+                        method: 'DELETE',
+                        endpoint: '/student/123456',
+                        acceptTypes: ['application/json'],
+                        description: 'Delete invalid student record'
+                    },
+                    {
+                        name: 'Delete Invalid Delivery',
+                        method: 'DELETE',
+                        endpoint: '/delivery/123456',
+                        acceptTypes: ['application/json'],
+                        description: 'Delete invalid delivery'
+                    },
+                    {
+                        name: 'Delete Invalid Module',
+                        method: 'DELETE',
+                        endpoint: '/module/123456',
+                        acceptTypes: ['application/json'],
+                        description: 'Delete invalid module'
+                    },
+                    {
+                        name: 'Invalid POST on Students',
+                        method: 'POST',
+                        endpoint: '/students',
+                        acceptTypes: ['application/json'],
+                        description: 'Invalid method on students'
+                    },
+                    {
+                        name: 'Invalid PUT on Students',
+                        method: 'PUT',
+                        endpoint: '/students',
+                        acceptTypes: ['application/json'],
+                        description: 'Invalid method on students'
+                    },
+                    {
+                        name: 'Invalid PATCH on Students',
+                        method: 'PATCH',
+                        endpoint: '/students',
+                        acceptTypes: ['application/json'],
+                        description: 'Invalid method on students'
+                    },
+                    {
+                        name: 'Invalid DELETE on Students',
+                        method: 'DELETE',
+                        endpoint: '/students',
+                        acceptTypes: ['application/json'],
+                        description: 'Invalid method on students'
+                    }
+                ]
+            }
+        ];
+
+        function populateTestGroups() {
+            const container = document.getElementById('test-groups');
+            tests.forEach((group, groupIndex) => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'test-group';
+                
+                groupDiv.innerHTML = `
+                    <div class="test-group-header">
+                        <h2>${group.name}</h2>
+                    </div>
+                    ${group.tests.map((test, testIndex) => `
+                        <div class="test-case" onclick="runTest(${groupIndex}, ${testIndex})">
+                            <span class="method ${test.method.toLowerCase()}">${test.method}</span>
+                            ${test.name}
+                            <div class="endpoint">${test.endpoint}</div>
+                        </div>
+                    `).join('')}
+                `;
+                
+                container.appendChild(groupDiv);
+            });
+        }
+
+        function getCurrentTimestamp() {
+            return new Date().toLocaleTimeString();
+        }
+
+        function appendToTerminal(content, isSuccess = true) {
+            const terminal = document.getElementById('terminal-output');
+            const entry = document.createElement('div');
+            entry.className = `output-entry ${isSuccess ? 'success' : 'error'}`;
+            
+            const formattedContent = content.replace(/\n/g, '<br>');
+            entry.innerHTML = `<span class="timestamp">[${getCurrentTimestamp()}]</span>${formattedContent}`;
+            
+            terminal.appendChild(entry);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+
+        function clearTerminal() {
+            document.getElementById('terminal-output').innerHTML = '';
+            const oldTree = document.getElementById('resource-tree');
+            if (oldTree) {
+                oldTree.remove();
+            }
+            window.resourceTree = new ResourceTree();
+            window.resourceTree.initialize('resource-tree');
+        }
+
+        function formatXmlNode(xml, level = 0) {
+            const indent = '  '.repeat(level);
+
+            xml = xml.trim()
+                .replace(/>\s+</g, '><')
+                .replace(/\s+/g, ' ')
+                .replace(/>\s+$/g, '>');
+
+            xml = xml.replace(/></g, '>\n' + indent + '<');
+            
+            xml = xml.replace(/(<[^>]+?)\/>/g, '$1 />');
+            
+            let result = '';
+            let currentIndent = indent;
+            let lines = xml.split('\n');
+            
+            for (let line of lines) {
+                line = line.trim();
+                if (line.match(/<\//)) {
+                    currentIndent = '  '.repeat(level - 1);
+                }
+                
+                if (line.length > 0) {
+                    result += currentIndent + line + '\n';
+                }
+                
+                if (line.match(/<[^/][^>]*>/) && !line.match(/\/>/)) {
+                    level++;
+                    currentIndent = '  '.repeat(level);
+                }
+                if (line.match(/<\//)) {
+                    level--;
+                    currentIndent = '  '.repeat(level);
+                }
+            }
+            
+            return result.trim();
+        }
+
+        function formatArrayToXml(array, rootTag = 'response') {
+            const collectionTag = {
+                'module': 'modules',
+                'delivery': 'deliveries',
+                'student': 'students'
+            }[rootTag] || `${rootTag}s`;
+
+            let xml = `<?xml version="1.0"?>\n<${collectionTag}>`;
+            
+            array.forEach((item) => {
+                xml += `\n<${rootTag}>`;
+                Object.entries(item).forEach(([key, value]) => {
+                    key = key.toLowerCase();
+                    if (Array.isArray(value)) {
+                        if (value.length === 0) {
+                            xml += `\n<${key} />`;
+                        } else {
+                            value.forEach(v => {
+                                xml += `\n<${key}>${escapeXml(v)}</${key}>`;
+                            });
+                        }
+                    } else {
+                        const safeValue = value === null || value === '' ? '' : escapeXml(value);
+                        xml += `\n<${key}>${safeValue}</${key}>`;
+                    }
+                });
+                xml += `\n</${rootTag}>`;
+            });
+            
+            xml += `\n</${collectionTag}>`;
+            return formatXmlNode(xml);
+        }
+
+        function formatObjectToXml(obj, rootTag = 'response') {
+            let xml = `<?xml version="1.0"?>\n<${rootTag}>`;
+            
+            Object.entries(obj).forEach(([key, value]) => {
+                key = key.toLowerCase();
+                if (Array.isArray(value)) {
+                    if (value.length === 0) {
+                        xml += `\n<${key} />`;
+                    } else {
+                        value.forEach(v => {
+                            xml += `\n<${key}>${escapeXml(v)}</${key}>`;
+                        });
+                    }
+                } else {
+                    const safeValue = value === null || value === '' ? '' : escapeXml(value);
+                    xml += `\n<${key}>${safeValue}</${key}>`;
+                }
+            });
+            
+            xml += `\n</${rootTag}>`;
+            return formatXmlNode(xml);
+        }
+
+        function escapeXml(unsafe) {
+            if (unsafe === null || unsafe === undefined) return '';
+            return unsafe.toString()
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&apos;')
+                .replace(/\n/g, '<br>');
+        }
+
+        async function makeRequest(test, acceptType) {
+            const url = API_BASE_URL + test.endpoint;
+
+            if (test.method === 'OPTIONS') {
+                try {
+                    const optionsResponse = await fetch(url, {
+                        method: 'OPTIONS',
+                        headers: {
+                            'Authorization': `Bearer ${AUTH_TOKEN}`,
+                            'Accept': acceptType
+                        }
+                    });
+
+                    let allowedMethods = new Set();
+                    
+                    const allowHeader = optionsResponse.headers.get('Allow');
+                    const corsHeader = optionsResponse.headers.get('Access-Control-Allow-Methods');
+                    
+                    if (allowHeader) {
+                        allowHeader.split(',').map(m => m.trim()).forEach(m => allowedMethods.add(m));
+                    }
+                    if (corsHeader) {
+                        corsHeader.split(',').map(m => m.trim()).forEach(m => allowedMethods.add(m));
+                    }
+
+                    if (allowedMethods.size === 0 || test.endpoint.endsWith('/')) {
+                        const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'];
+                        
+                        for (const method of methods) {
+                            try {
+                                const testResponse = await fetch(url, {
+                                    method: method,
+                                    headers: {
+                                        'Authorization': `Bearer ${AUTH_TOKEN}`,
+                                        'Accept': acceptType,
+                                        'Content-Type': 'application/json'
+                                    }
+                                });
+                                
+                                if (testResponse.status !== 405) {
+                                    allowedMethods.add(method);
+                                }
+                            } catch (error) {
+                                console.warn(`Error testing ${method}:`, error);
+                            }
+                        }
+
+                        if (test.endpoint.endsWith('/')) {
+                            const resourceEndpoint = url + 'test';
+                            for (const method of methods) {
+                                try {
+                                    const testResponse = await fetch(resourceEndpoint, {
+                                        method: method,
+                                        headers: {
+                                            'Authorization': `Bearer ${AUTH_TOKEN}`,
+                                            'Accept': acceptType,
+                                            'Content-Type': 'application/json'
+                                        }
+                                    });
+                                    
+                                    if (testResponse.status !== 405) {
+                                        allowedMethods.add(method);
+                                    }
+                                } catch (error) {
+                                    console.warn(`Error testing ${method} on resource:`, error);
+                                }
+                            }
+                        }
+                    }
+
+                    test.allowedMethods = Array.from(allowedMethods).sort();
+                    const responseData = {
+                        allowedMethods: test.allowedMethods,
+                        message: `Available methods for ${test.endpoint}: ${test.allowedMethods.join(', ')}`
+                    };
+
+                    if (acceptType === 'application/xml') {
+                        const xmlData = formatObjectToXml(responseData);
+                        return {
+                            status: optionsResponse.status,
+                            statusText: optionsResponse.statusText,
+                            contentType: acceptType,
+                            allowedMethods: test.allowedMethods,
+                            headers: Object.fromEntries(optionsResponse.headers.entries()),
+                            data: xmlData
+                        };
+                    }
+
+                    return {
+                        status: optionsResponse.status,
+                        statusText: optionsResponse.statusText,
+                        contentType: acceptType,
+                        allowedMethods: test.allowedMethods,
+                        headers: Object.fromEntries(optionsResponse.headers.entries()),
+                        data: responseData
+                    };
+                } catch (error) {
+                    return {
+                        status: 0,
+                        statusText: 'Network Error',
+                        error: error.message,
+                        data: { error: error.message }
+                    };
+                }
+            }
+
+            try {
+                const preflightResponse = await fetch(url, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Authorization': `Bearer ${AUTH_TOKEN}`,
+                        'Access-Control-Request-Method': test.method,
+                        'Access-Control-Request-Headers': 'Authorization,Content-Type'
+                    }
+                });
+                
+                let allowedMethods = new Set();
+                const allowHeader = preflightResponse.headers.get('Allow');
+                const corsHeader = preflightResponse.headers.get('Access-Control-Allow-Methods');
+                
+                if (allowHeader) {
+                    allowHeader.split(',').map(m => m.trim()).forEach(m => allowedMethods.add(m));
+                }
+                if (corsHeader) {
+                    corsHeader.split(',').map(m => m.trim()).forEach(m => allowedMethods.add(m));
+                }
+                
+                test.allowedMethods = Array.from(allowedMethods).sort();
+            } catch (error) {
+                console.warn('Preflight request failed:', error);
+            }
+
+            const options = {
+                method: test.method,
+                headers: {
+                    'Authorization': `Bearer ${AUTH_TOKEN}`,
+                    'Accept': acceptType
+                }
+            };
+
+            if (test.headers) {
+                options.headers = { ...options.headers, ...test.headers };
+            } else if (test.body && (test.method === 'POST' || test.method === 'PUT' || test.method === 'PATCH')) {
+                options.headers['Content-Type'] = 'application/json';
+            }
+
+            if (test.body) {
+                if (options.headers['Content-Type'] === 'text/plain') {
+                    options.body = test.body;
+                } else if (options.headers['Content-Type']?.includes('json')) {
+                    options.body = JSON.stringify(test.body);
+                }
+            }
+
+            try {
+                const response = await fetch(url, options);
+                const responseText = await response.text();
+                let data;
+                
+                if (acceptType === 'text/html') {
+                data = responseText;
+                } else {
+                    try {
+                        data = JSON.parse(responseText);
+                    } catch {
+                        data = responseText.trim();
+                    }
+                }
+
+                let formattedData;
+                if (acceptType === 'application/xml') {
+                    if (!data) {
+                        formattedData = '<?xml version="1.0" encoding="UTF-8"?>\n<response/>';
+                    } else if (Array.isArray(data)) {
+                        formattedData = formatArrayToXml(data);
+                    } else if (typeof data === 'object') {
+                        formattedData = formatObjectToXml(data);
+                    } else {
+                        formattedData = `<?xml version="1.0" encoding="UTF-8"?>\n<response>\n  <value>${escapeXml(data)}</value>\n</response>`;
+                    }
+                } else {
+                    formattedData = data;
+                }
+
+                return {
+                    status: response.status,
+                    statusText: response.statusText,
+                    contentType: acceptType,
+                    allowedMethods: test.allowedMethods || [],
+                    headers: Object.fromEntries(response.headers.entries()),
+                    data: formattedData
+                };
+            } catch (error) {
+                return {
+                    status: 0,
+                    statusText: 'Network Error',
+                    error: error.message
+                };
+            }
+        }
+
+        async function runTest(groupIndex, testIndex) {
+            const test = tests[groupIndex].tests[testIndex];
+            appendToTerminal(`Running test: ${test.name}`);
+            
+            for (const acceptType of test.acceptTypes) {
+                appendToTerminal(`Testing with Accept: ${acceptType}`);
+                const response = await makeRequest(test, acceptType);
+                const isSuccess = response.status >= 200 && response.status < 300;
+                
+                appendToTerminal(
+                    `Status: ${response.status} ${response.statusText}\n` +
+                    `Response:\n${JSON.stringify(response, null, 2)}`,
+                    isSuccess
+                );
+            }
+        }
+
+        function exportLog() {
+            const terminal = document.getElementById('terminal-output');
+
+            // Metadata
+            const header = [
+                '=================================',
+                'COMP3227 API Test Suite Results',
+                `Generated: ${new Date().toISOString()}`,
+                '=================================\n'
+            ].join('\n');
+
+            const logEntries = Array.from(terminal.children).map(entry => {
+                const timestamp = entry.querySelector('.timestamp')?.textContent || '';
+                let content = entry.textContent.substring(timestamp.length);
+
+                try {
+                    const jsonStart = content.indexOf('{');
+                    const jsonEnd = content.lastIndexOf('}');
+                    if (jsonStart !== -1 && jsonEnd !== -1) {
+                        const prefix = content.substring(0, jsonStart).trim();
+                        const jsonString = content.substring(jsonStart, jsonEnd + 1);
+                        const jsonData = JSON.parse(jsonString);
+                        content = prefix + '\n' + JSON.stringify(jsonData, null, 2);
+                    }
+                } catch (e) {
+                    // Iff JSON p'g fail -> use original
+                    content = content.trim();
+                }
+
+                content = content
+                    .replace(/\r\n/g, '\n')
+                    .replace(/\n\s*\n\s*\n/g, '\n\n')
+                    .replace(/\\n/g, '\n')
+                    .replace(/\\"/g, '"')
+                    .trim();
+
+                // Return f'd
+                return [
+                    timestamp.trim(),
+                    content,
+                    '-'.repeat(80)
+                ].filter(Boolean).join('\n');
+            });
+
+            // Combine
+            const fullLog = [
+                header,
+                logEntries.join('\n\n')
+            ].join('\n\n');
+
+            try {
+                const blob = new Blob([fullLog], { type: 'text/plain;charset=utf-8' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                
+                // Filename
+                const timestamp = new Date().toISOString()
+                    .replace(/[:.]/g, '-')
+                    .replace('T', '_')
+                    .split('.')[0];
+                const filename = `api-test-log_${timestamp}.txt`;
+                
+                // Trigger downlaod
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Housekeeping
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                }, 100);
+
+                // Terminal conf
+                appendToTerminal(`Log exported: ${filename}`, true);
+            } catch (error) {
+                appendToTerminal(`Error exporting log: ${error.message}`, false);
+            }
+        }
+
+        async function runAllTests() {
+            clearTerminal();
+            appendToTerminal('Executing all tests...');
+            
+            for (let i = 0; i < tests.length; i++) {
+                for (let j = 0; j < tests[i].tests.length; j++) {
+                    await runTest(i, j);
+                }
+            }
+            
+            appendToTerminal('All tests executed.');
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            populateTestGroups();
+            appendToTerminal('Test suite initialised.');
+            runAllTests();
+        });
+
+        class ResourceTree {
+            constructor() {
+                this.nodes = new Map();
+                this.container = null;
+            }
+
+            async _makeGetRequest(path) {
+                try {
+                    const response = await fetch(API_BASE_URL + path, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${AUTH_TOKEN}`,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    const contentType = response.headers.get('content-type');
+                    let responseData;
+                    
+                    try {
+                        responseData = await response.json();
+                    } catch {
+                        responseData = await response.text();
+                    }
+
+                    this._logToTerminal(
+                        `GET ${path}\nStatus: ${response.status} ${response.statusText}\n` +
+                        `Content-Type: ${contentType}\nResponse:\n${JSON.stringify(responseData, null, 2)}`,
+                        response.ok
+                    );
+
+                    return responseData;
+                } catch (error) {
+                    this._logToTerminal(`Error fetching ${path}: ${error.message}`, false);
+                    throw error;
+                }
+            }
+
+            _logToTerminal(content, isSuccess = true) {
+                const terminalOutput = document.getElementById('terminal-output');
+                const entry = document.createElement('div');
+                entry.className = `output-entry ${isSuccess ? 'success' : 'error'}`;
+                entry.innerHTML = `<span class="timestamp">[${new Date().toLocaleTimeString()}]</span>${content}`;
+                terminalOutput.appendChild(entry);
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+
+            initialize(containerId) {
+                const terminal = document.querySelector('.terminal-panel');
+                this.container = document.createElement('div');
+                this.container.id = containerId;
+                this.container.style.cssText = `
+                    position: fixed;
+                    top: 73px;
+                    right: 30px;
+                    width: 300px;
+                    max-height: 400px;
+                    background: var(--color-canvas-subtle);
+                    border: 1px solid var(--color-border-default);
+                    border-radius: 6px;
+                    padding: 16px;
+                    overflow-y: auto;
+                    z-index: 1000;
+                    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas;
+                    font-size: 12px;
+                `;
+
+                const header = document.createElement('div');
+                header.style.cssText = `
+                    color: var(--color-accent-fg);
+                    font-weight: bold;
+                    margin-bottom: 12px;
+                    padding-bottom: 8px;
+                    border-bottom: 1px solid var(--color-border-muted);
+                `;
+                header.textContent = 'Resource Tree';
+                this.container.appendChild(header);
+
+                terminal.appendChild(this.container);
+            }
+
+            async fetchNodeData(path) {
+                try {
+                    const data = await this._makeGetRequest(path);
+                    this.updateNode(path, data);
+
+                    if (data) {
+                        Object.entries(data).forEach(([key, value]) => {
+                            if (Array.isArray(value)) {
+                                value.forEach(ref => {
+                                    if (typeof ref === 'string' && ref.startsWith('/')) {
+                                        this.updateNode(ref.trim(), { [key === 'delivery' ? 'module' : 'delivery']: path });
+                                    }
+                                });
+                            } else if (typeof value === 'string' && value.startsWith('/')) {
+                                this.updateNode(value.trim(), { parent: path });
+                                this.updateNode(path, { [key]: value.trim() });
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error in fetchNodeData:', error);
+                }
+            }
+
+            updateNode(path, data) {
+                if (!path) return;
+                path = path.trim();
+                
+                const existingNode = this.nodes.get(path);
+                const node = {
+                    type: this._getResourceType(path),
+                    data: { ...(existingNode?.data || {}), ...data },
+                    children: existingNode?.children || new Set(),
+                    parent: existingNode?.parent || null
+                };
+
+                this.nodes.set(path, node);
+                this._updateRelationships();
+                this.render();
+            }
+
+            removeNode(path) {
+                if (!path) return;
+                path = path.trim();
+                
+                const node = this.nodes.get(path);
+                if (node) {
+                    if (node.parent) {
+                        const parentNode = this.nodes.get(node.parent);
+                        if (parentNode) {
+                            parentNode.children.delete(path);
+                        }
+                    }
+                    
+                    for (const childPath of node.children) {
+                        this.nodes.delete(childPath);
+                    }
+                    this.nodes.delete(path);
+                    
+                    this.render();
+                }
+            }
+
+            _cleanupUnknownNodes() {
+                    const unknownNodes = Array.from(this.nodes.entries())
+                        .filter(([_, node]) => node.type === 'unknown')
+                        .map(([path, _]) => path);
+                    
+                    unknownNodes.forEach(path => {
+                        this.removeNode(path);
+                        // this._logToTerminal(`Cleaned up unknown node: ${path}`, true);
+                    });
+                }
+
+            _getResourceType(path) {
+                if (path.startsWith('/module/')) return 'module';
+                if (path.startsWith('/delivery/')) return 'delivery';
+                if (path.startsWith('/student/')) return 'student';
+                return 'unknown';
+            }
+
+            _updateRelationships() {
+                for (const [path, node] of this.nodes.entries()) {
+                    if (!node.data) continue;
+
+                    const moduleLinks = new Set();
+                    const deliveryLinks = new Set();
+                    const studentLinks = new Set();
+
+                    const extractLinks = (obj) => {
+                        if (!obj) return;
+                        if (typeof obj === 'string') {
+                            const value = obj.trim();
+                            if (value.startsWith('/module/')) moduleLinks.add(value);
+                            if (value.startsWith('/delivery/')) deliveryLinks.add(value);
+                            if (value.startsWith('/student/')) studentLinks.add(value);
+                        } else if (Array.isArray(obj)) {
+                            obj.forEach(item => extractLinks(item));
+                        } else if (typeof obj === 'object') {
+                            Object.values(obj).forEach(value => extractLinks(value));
+                        }
+                    };
+
+                    extractLinks(node.data);
+
+                    switch (node.type) {
+                        case 'module':
+                            deliveryLinks.forEach(deliveryPath => {
+                                if (this.nodes.has(deliveryPath)) {
+                                    node.children.add(deliveryPath);
+                                    this.nodes.get(deliveryPath).parent = path;
+                                }
+                            });
+                            break;
+
+                        case 'delivery':
+                            studentLinks.forEach(studentPath => {
+                                if (this.nodes.has(studentPath)) {
+                                    node.children.add(studentPath);
+                                    this.nodes.get(studentPath).parent = path;
+                                }
+                            });
+                            if (moduleLinks.size > 0) {
+                                const modulePath = Array.from(moduleLinks)[0];
+                                if (this.nodes.has(modulePath)) {
+                                    this.nodes.get(modulePath).children.add(path);
+                                    node.parent = modulePath;
+                                }
+                            }
+                            break;
+
+                        case 'student':
+                            if (deliveryLinks.size > 0) {
+                                const deliveryPath = Array.from(deliveryLinks)[0];
+                                if (this.nodes.has(deliveryPath)) {
+                                    this.nodes.get(deliveryPath).children.add(path);
+                                    node.parent = deliveryPath;
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+
+            render() {
+                if (!this.container) return;
+                
+                this._cleanupUnknownNodes();
+
+                while (this.container.childNodes.length > 1) {
+                    this.container.removeChild(this.container.lastChild);
+                }
+
+                const roots = Array.from(this.nodes.entries())
+                    .filter(([_, node]) => !node.parent)
+                    .map(([path, _]) => path);
+
+                roots.forEach(root => this._renderNode(root, this.container, 0));
+            }
+
+            _renderNode(path, parent, level) {
+                const node = this.nodes.get(path);
+                if (!node) return;
+
+                const nodeEl = document.createElement('div');
+                nodeEl.style.cssText = `
+                    margin-left: ${level * 20}px;
+                    margin-top: 4px;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    position: relative;
+                `;
+
+                if (level > 0) {
+                    nodeEl.style.borderLeft = '1px solid var(--color-border-muted)';
+                    nodeEl.style.marginLeft = `${level * 20 - 1}px`;
+                }
+
+                const typeColors = {
+                    module: 'var(--color-success-fg)',
+                    delivery: 'var(--color-done-fg)',
+                    student: 'var(--color-attention-fg)'
+                };
+
+                nodeEl.style.color = typeColors[node.type] || 'var(--color-fg-default)';
+                
+                const icons = {
+                    module: '📚',
+                    delivery: '📅',
+                    student: '👤'
+                };
+                
+                nodeEl.textContent = `${icons[node.type] || '❓'} ${path}`;
+                
+                nodeEl.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await this.fetchNodeData(path);
+                });
+                
+                nodeEl.addEventListener('mouseover', () => {
+                    nodeEl.style.backgroundColor = 'var(--color-btn-hover-bg)';
+                });
+                
+                nodeEl.addEventListener('mouseout', () => {
+                    nodeEl.style.backgroundColor = 'transparent';
+                });
+
+                parent.appendChild(nodeEl);
+
+                Array.from(node.children).sort().forEach(childPath => {
+                    this._renderNode(childPath, parent, level + 1);
+                });
+            }
+        }
+
+        window.resourceTree = new ResourceTree();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.resourceTree.initialize('resource-tree');
+        });
+
+        const originalMakeRequest = makeRequest;
+
+        makeRequest = async function(test, acceptType) {
+            const response = await originalMakeRequest(test, acceptType);
+            
+            if (response.status >= 200 && response.status < 300) {
+                const path = test.endpoint.replace(/\/?$/, '');
+                
+                if (test.method === 'DELETE') {
+                    window.resourceTree.removeNode(path);
+                } else if (response.data) {
+                    if (Array.isArray(response.data)) {
+                        response.data.forEach(item => {
+                            if (item.self) {
+                                const itemPath = item.self.trim();
+                                window.resourceTree.updateNode(itemPath, item);
+                                
+                                Object.entries(item).forEach(([key, value]) => {
+                                    if (Array.isArray(value)) {
+                                        value.forEach(ref => {
+                                            if (typeof ref === 'string' && ref.startsWith('/')) {
+                                                window.resourceTree.updateNode(ref.trim(), { [key === 'delivery' ? 'module' : 'delivery']: itemPath });
+                                            }
+                                        });
+                                    } else if (typeof value === 'string' && value.startsWith('/')) {
+                                        window.resourceTree.updateNode(value.trim(), { parent: itemPath });
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        const selfPath = response.data.self || path;
+                        window.resourceTree.updateNode(selfPath, response.data);
+
+                        Object.entries(response.data).forEach(([key, value]) => {
+                            if (Array.isArray(value)) {
+                                value.forEach(ref => {
+                                    if (typeof ref === 'string' && ref.startsWith('/')) {
+                                        window.resourceTree.updateNode(ref.trim(), { [key === 'delivery' ? 'module' : 'delivery']: selfPath });
+                                    }
+                                });
+                            } else if (typeof value === 'string' && value.startsWith('/')) {
+                                window.resourceTree.updateNode(value.trim(), { parent: selfPath });
+                                window.resourceTree.updateNode(selfPath, { [key]: value.trim() });
+                            }
+                        });
+                    }
+                }
+            }
+            
+            return response;
+        };
+    </script>
+</body>

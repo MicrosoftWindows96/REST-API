@@ -1,0 +1,137 @@
+stateDiagram-v2
+    [*] --> Modules: GET /module/
+    Modules --> Modules: POST /module/ (Staff)
+    Modules --> SpecificModule: GET /module/{code}
+    SpecificModule --> SpecificModule: PUT /module/{code} (Staff)
+    SpecificModule --> SpecificModule: PATCH /module/{code} (Staff)
+    SpecificModule --> [*]: DELETE /module/{code} (Staff)
+    SpecificModule --> Deliveries: GET /module/{code}/delivery
+    Deliveries --> SpecificDelivery: GET /module/{code}/delivery/{crn}
+    Deliveries --> Deliveries: POST /module/{code}/delivery (Staff)
+    SpecificDelivery --> SpecificDelivery: PUT /module/{code}/delivery/{crn} (Staff)
+    SpecificDelivery --> [*]: DELETE /module/{code}/delivery/{crn} (Staff)
+    SpecificDelivery --> Assignments: GET /module/{code}/delivery/{crn}/assignment
+    Assignments --> SpecificAssignment: GET /module/{code}/delivery/{crn}/assignment/{arn}
+    Assignments --> Assignments: POST /module/{code}/delivery/{crn}/assignment (Staff)
+    SpecificAssignment --> SpecificAssignment: PUT /module/{code}/delivery/{crn}/assignment/{arn} (Staff)
+    SpecificAssignment --> SpecificAssignment: PATCH /module/{code}/delivery/{crn}/assignment/{arn} (Staff)
+    SpecificAssignment --> [*]: DELETE /module/{code}/delivery/{crn}/assignment/{arn} (Staff)
+    SpecificAssignment --> Submissions: GET /module/{code}/delivery/{crn}/assignment/{arn}/submission (Staff)
+    Submissions --> SpecificSubmission: POST /module/{code}/delivery/{crn}/assignment/{arn}/submission/{username} (Student)
+    Submissions --> RejectedSubmission: 413 - Payload Too Large
+    SpecificSubmission --> SpecificSubmission: GET /module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}
+    SpecificSubmission --> File: GET /module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}/{fileName}
+    SpecificSubmission --> Unauthorized: 401 - Unauthorized
+    File --> [*]: End
+
+    Modules --> InvalidModule: 404 - Module Not Found
+    Deliveries --> InvalidDelivery: 404 - Delivery Not Found
+    Assignments --> InvalidAssignment: 404 - Assignment Not Found
+    Submissions --> InvalidSubmission: 404 - Submission Not Found
+
+    classDef moduleState fill:#161b22,stroke:#30363d,color:#c9d1d9
+    classDef deliveryState fill:#161b22,stroke:#30363d,color:#56d364
+    classDef assignmentState fill:#161b22,stroke:#30363d,color:#58a6ff
+    classDef submissionState fill:#161b22,stroke:#30363d,color:#a371f7
+    classDef errorState fill:#161b22,stroke:#30363d,color:#f85149
+    classDef staffState fill:#161b22,stroke:#30363d,color:#e3b341
+    classDef studentState fill:#161b22,stroke:#30363d,color:#56d364
+    classDef fileState fill:#161b22,stroke:#30363d,color:#5bc0de
+
+    class Modules,SpecificModule moduleState
+    class Deliveries,SpecificDelivery deliveryState
+    class Assignments,SpecificAssignment assignmentState
+    class Submissions,SpecificSubmission submissionState
+    class InvalidModule,InvalidDelivery,InvalidAssignment,InvalidSubmission,RejectedSubmission,Unauthorized errorState
+    class File fileState
+
+stateDiagram-v2
+    [*] --> Modules
+    
+    classDef moduleState fill:#161b22,stroke:#30363d,color:#c9d1d9
+    classDef deliveryState fill:#161b22,stroke:#30363d,color:#56d364
+    classDef assignmentState fill:#161b22,stroke:#30363d,color:#58a6ff
+    classDef submissionState fill:#161b22,stroke:#30363d,color:#a371f7
+    classDef errorState fill:#161b22,stroke:#30363d,color:#f85149
+    classDef normalState fill:#0d1117,stroke:#21262d,color:#8b949e
+    classDef staffState fill:#161b22,stroke:#30363d,color:#e3b341
+    classDef studentState fill:#161b22,stroke:#30363d,color:#56d364
+    classDef fileState fill:#161b22,stroke:#30363d,color:#5bc0de
+
+    state Modules {
+        [*] --> ModuleList: GET /module/
+        ModuleList --> NewModule: POST /module/ (Staff)
+        ModuleList --> SpecificModule: GET /module/{code}
+        state SpecificModule {
+            [*] --> ViewModule: GET /module/{code}
+            ViewModule --> UpdateModule: PUT /module/{code} (Staff)
+            ViewModule --> PartialUpdateModule: PATCH /module/{code} (Staff)
+            ViewModule --> DeleteModule: DELETE /module/{code} (Staff)
+            ViewModule --> Deliveries: GET /module/{code}/delivery
+        }
+        state ModuleErrors {
+            [*] --> InvalidModule: 404 - Module Not Found
+            InvalidModule --> [*]
+        }
+    }
+
+    state Deliveries {
+        [*] --> DeliveryList: GET /module/{code}/delivery
+        DeliveryList --> NewDelivery: POST /module/{code}/delivery (Staff)
+        DeliveryList --> SpecificDelivery: GET /module/{code}/delivery/{crn}
+        state SpecificDelivery {
+            [*] --> ViewDelivery: GET /module/{code}/delivery/{crn}
+            ViewDelivery --> UpdateDelivery: PUT /module/{code}/delivery/{crn} (Staff)
+            ViewDelivery --> DeleteDelivery: DELETE /module/{code}/delivery/{crn} (Staff)
+            ViewDelivery --> Assignments: GET /module/{code}/delivery/{crn}/assignment
+        }
+        state DeliveryErrors {
+            [*] --> UnauthorizedDelivery: 401 - Unauthorized
+            UnauthorizedDelivery --> [*]
+        }
+    }
+
+    state Assignments {
+        [*] --> AssignmentList: GET /module/{code}/delivery/{crn}/assignment
+        AssignmentList --> NewAssignment: POST /module/{code}/delivery/{crn}/assignment (Staff)
+        AssignmentList --> SpecificAssignment: GET /module/{code}/delivery/{crn}/assignment/{arn}
+        state SpecificAssignment {
+            [*] --> ViewAssignment: GET /module/{code}/delivery/{crn}/assignment/{arn}
+            ViewAssignment --> UpdateAssignment: PUT /module/{code}/delivery/{crn}/assignment/{arn} (Staff)
+            ViewAssignment --> PartialUpdateAssignment: PATCH /module/{code}/delivery/{crn}/assignment/{arn} (Staff)
+            ViewAssignment --> DeleteAssignment: DELETE /module/{code}/delivery/{crn}/assignment/{arn} (Staff)
+            ViewAssignment --> Submissions: GET /module/{code}/delivery/{crn}/assignment/{arn}/submission
+        }
+    }
+
+    state Submissions {
+        [*] --> SubmissionList: GET /module/{code}/delivery/{crn}/assignment/{arn}/submission (Staff)
+        SubmissionList --> NewSubmission: POST /module/{code}/delivery/{crn}/assignment/{arn}/submission/{username} (Student)
+        SubmissionList --> SpecificSubmission: GET /module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}
+        state SpecificSubmission {
+            [*] --> ViewSubmission: GET /module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}
+            ViewSubmission --> File: GET /module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}/{fileName}
+        }
+        state SubmissionErrors {
+            [*] --> FileTooLarge: 413 - Payload Too Large
+            [*] --> UnauthorizedSubmission: 401 - Unauthorized
+        }
+    }
+
+    File --> [*]: End
+    DeleteModule --> [*]: End
+    DeleteDelivery --> [*]: End
+    DeleteAssignment --> [*]: End
+    FileTooLarge --> [*]
+    UnauthorizedSubmission --> [*]
+
+    class Modules,ModuleList,NewModule,SpecificModule,ViewModule moduleState
+    class UpdateModule,PartialUpdateModule,DeleteModule staffState
+    class Deliveries,DeliveryList,NewDelivery,SpecificDelivery,ViewDelivery deliveryState
+    class UpdateDelivery,DeleteDelivery staffState
+    class Assignments,AssignmentList,NewAssignment,SpecificAssignment,ViewAssignment assignmentState
+    class UpdateAssignment,PartialUpdateAssignment,DeleteAssignment staffState
+    class Submissions,SubmissionList,SpecificSubmission,ViewSubmission submissionState
+    class NewSubmission studentState
+    class File fileState
+    class ModuleErrors,DeliveryErrors,SubmissionErrors,FileTooLarge,UnauthorizedSubmission,InvalidModule,UnauthorizedDelivery errorState

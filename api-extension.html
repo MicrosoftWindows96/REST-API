@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SZ10G21 - REST API Extension</title>
+    <title>SZ10G21 - API Extension</title>
     <style>
-        /* GitHub Dark theme colors */
         :root {
             --color-canvas-default: #0d1117;
             --color-canvas-subtle: #161b22;
@@ -14,16 +13,17 @@
             --color-border-muted: #21262d;
             --color-accent-fg: #58a6ff;
             --color-accent-emphasis: #1f6feb;
-            --color-success-fg: #3fb950;
-            --color-attention-fg: #d29922;
+            --color-success-fg: #56d364;
+            --color-attention-fg: #e3b341;
             --color-severe-fg: #db6d28;
             --color-danger-fg: #f85149;
             --color-done-fg: #a371f7;
             --color-fg-default: #c9d1d9;
             --color-fg-muted: #8b949e;
-            --color-fg-subtle: #484f58;
+            --color-fg-subtle: #6e7681;
             --color-primer-shadow-highlight: rgba(201,209,217,0.15);
-            --color-primer-shadow-inset: rgba(1,4,9,0.9);
+            --color-primer-shadow-inset: rgba(1,4,9,0.85);
+            --color-neutral-muted: rgba(110,118,129,0.4);
         }
 
         * {
@@ -47,6 +47,7 @@
             font-weight: 600;
             margin-top: 24px;
             margin-bottom: 16px;
+            color: var(--color-fg-default);
         }
 
         h1 {
@@ -72,6 +73,7 @@
 
         p {
             margin-bottom: 16px;
+            color: var(--color-fg-default);
         }
 
         a {
@@ -86,6 +88,7 @@
         ul {
             margin-bottom: 16px;
             padding-left: 32px;
+            color: var(--color-fg-default);
         }
 
         li {
@@ -115,9 +118,10 @@
             margin-right: 8px;
             border-radius: 2em;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
             font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
             border: 1px solid transparent;
+            text-transform: uppercase;
         }
 
         .get { 
@@ -139,9 +143,9 @@
         }
 
         .patch { 
-            color: #76e3ea;
-            background-color: rgba(118, 227, 234, 0.15);
-            border-color: #76e3ea;
+            color: var(--color-severe-fg);
+            background-color: rgba(219, 109, 40, 0.15);
+            border-color: var(--color-severe-fg);
         }
         
         .delete { 
@@ -150,16 +154,68 @@
             border-color: var(--color-danger-fg);
         }
 
+        .options { 
+            color: var(--color-accent-fg);
+            background-color: rgba(88, 166, 255, 0.15);
+            border-color: var(--color-accent-fg);
+        }
+
+        .accept-type {
+            display: inline-block;
+            padding: 2px 6px;
+            margin-right: 8px;
+            border-radius: 2em;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            border: 1px solid transparent;
+            text-transform: uppercase;
+        }
+
+        .json {
+            color: #f0ad4e;
+            background-color: rgba(240, 173, 78, 0.15);
+            border-color: #f0ad4e;
+        }
+
+        .html {
+            color: #d9534f;
+            background-color: rgba(217, 83, 79, 0.15);
+            border-color: #d9534f;
+        }
+
+        .xml {
+            color: #5bc0de;
+            background-color: rgba(91, 192, 222, 0.15);
+            border-color: #5bc0de;
+        }
+
+        .pdf {
+            color: #f0ad4e;
+            background-color: rgba(240, 173, 78, 0.15);
+            border-color: #f0ad4e;
+        }
+
+        .label {
+            margin-top: 16px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-fg-default);
+        }
+
         pre {
             padding: 16px;
-            margin: 16px 0;
+            margin: 8px 0 16px;
             overflow: auto;
+            max-height: 400px;
             font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
             font-size: 13px;
             line-height: 1.45;
             background-color: var(--color-canvas-default);
             border-radius: 6px;
             border: 1px solid var(--color-border-default);
+            color: var(--color-fg-default);
         }
 
         code {
@@ -169,6 +225,7 @@
             font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
             background-color: var(--color-canvas-subtle);
             border-radius: 6px;
+            color: var(--color-fg-default);
         }
 
         table {
@@ -179,6 +236,7 @@
             margin: 16px 0;
             border-spacing: 0;
             border-collapse: collapse;
+            color: var(--color-fg-default);
         }
 
         th, td {
@@ -217,6 +275,7 @@
         .description {
             color: var(--color-fg-muted);
             margin: 8px 0 16px;
+            font-size: 14px;
         }
 
         blockquote {
@@ -225,968 +284,1494 @@
             border-left: 0.25em solid var(--color-border-default);
             margin: 16px 0;
         }
+
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--color-canvas-subtle);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--color-border-default);
+            border: 3px solid var(--color-canvas-subtle);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--color-border-muted);
+        }
     </style>
 </head>
 <body>
-    <h1>SZ10G21 - REST API Extension</h1>
+    <h1>SZ10G21 - API Extension</h1>
 
-    <section id="overview">
-        <h2>Overview</h2>
-        <p>This extension adds support for managing coursework assignments and student submissions. The new endpoints follow REST principles and integrate with the existing module and delivery resources.</p>
-        
-        <h3>Key Features</h3>
+    <section id="uri-structure">
+        <p><strong>Base URL:</strong></p>
+        <pre>https://ecs.soton.ac.uk</pre>
+
+        <p><strong>Endpoints:</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Resource</th>
+                    <th>URI</th>
+                    <th>Methods</th>
+                    <th>Accept Types</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modules</td>
+                    <td><code>/module/</code></td>
+                    <td>
+                        <span class="method get">GET</span>  
+                        <span class="method post">POST</span>  
+                        <span class="method options">OPTIONS</span>
+                    </td>
+                    <td>
+                        <span class="accept-type json">JSON</span>  
+                        <span class="accept-type xml">XML</span> 
+                        <span class="accept-type html">HTML</span>
+                    </td>
+                    <td>Retrieve a list of all modules, create a new module, or check allowed methods.</td>
+                </tr>
+                <tr>
+                    <td>Specific Module</td>
+                    <td><code>/module/{code}</code></td>
+                    <td>
+                        <span class="method get">GET</span>  
+                        <span class="method put">PUT</span>  
+                        <span class="method patch">PATCH</span>  
+                        <span class="method delete">DELETE</span>  
+                        <span class="method options">OPTIONS</span>
+                    </td>
+                    <td>
+                        <span class="accept-type json">JSON</span>  
+                        <span class="accept-type xml">XML</span> 
+                        <span class="accept-type html">HTML</span>
+                    </td>
+                    <td>Retrieve, update, delete a specific module, or check allowed methods.</td>
+                </tr>
+                <tr>
+                    <td>Deliveries</td>
+                    <td><code>/module/{code}/delivery/{crn}</code></td>
+                    <td>
+                        <span class="method get">GET</span>  
+                        <span class="method post">POST</span>  
+                        <span class="method options">OPTIONS</span>
+                    </td>
+                    <td>
+                        <span class="accept-type json">JSON</span>  
+                        <span class="accept-type xml">XML</span> 
+                        <span class="accept-type html">HTML</span>
+                    </td>
+                    <td>Retrieve details of a specific delivery, create a new delivery for a module, or check allowed methods.</td>
+                </tr>
+                <tr>
+                    <td>Assignments</td>
+                    <td><code>/module/{code}/delivery/{crn}/assignment/{arn}</code></td>
+                    <td>
+                        <span class="method get">GET</span>  
+                        <span class="method post">POST</span>  
+                        <span class="method options">OPTIONS</span>
+                    </td>
+                    <td>
+                        <span class="accept-type json">JSON</span>  
+                        <span class="accept-type xml">XML</span> 
+                        <span class="accept-type html">HTML</span>
+                    </td>
+                    <td>Retrieve details of a specific assignment, create a new assignment within a delivery, or check allowed methods.</td>
+                </tr>
+                <tr>
+                    <td>Students</td>
+                    <td><code>/student/{username}</code></td>
+                    <td>
+                        <span class="method get">GET</span>  
+                        <span class="method post">POST</span>  
+                        <span class="method put">PUT</span>  
+                        <span class="method patch">PATCH</span>  
+                        <span class="method delete">DELETE</span>  
+                        <span class="method options">OPTIONS</span>
+                    </td>
+                    <td>
+                        <span class="accept-type json">JSON</span>  
+                        <span class="accept-type xml">XML</span> 
+                        <span class="accept-type html">HTML</span>
+                    </td>
+                    <td>Retrieve, create, update, delete a student record, or check allowed methods.</td>
+                </tr>
+                <tr>
+                    <td>Submissions</td>
+                    <td><code>/module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}</code></td>
+                    <td>
+                        <span class="method get">GET</span>  
+                        <span class="method post">POST</span>  
+                        <span class="method put">PUT</span>  
+                        <span class="method patch">PATCH</span>  
+                        <span class="method delete">DELETE</span>  
+                        <span class="method options">OPTIONS</span>
+                    </td>
+                    <td>
+                        <span class="accept-type json">JSON</span>  
+                        <span class="accept-type xml">XML</span>  
+                        <span class="accept-type html">HTML</span>
+                    </td>
+                    <td>Manage submissions for a specific assignment by a student, or check allowed methods.</td>
+                </tr>
+                <tr>
+                    <td>File</td>
+                    <td><code>/module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}/{fileName}</code></td>
+                    <td>
+                        <span class="method get">GET</span>  
+                        <span class="method options">OPTIONS</span>
+                    </td>
+                    <td>
+                        <span class="accept-type json">JSON</span>  
+                        <span class="accept-type xml">XML</span>  
+                        <span class="accept-type pdf">PDF</span>
+                    </td>
+                    <td>Access the submitted file or check allowed methods.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Breakdown:</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Segment</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>/module/{code}</code></td>
+                    <td>Identifies a specific module using its unique code (e.g., COMP3227).</td>
+                </tr>
+                <tr>
+                    <td><code>/delivery/{crn}</code></td>
+                    <td>Specifies the delivery of the module identified by its Course Reference Number (CRN) (e.g., 050198XML).</td>
+                </tr>
+                <tr>
+                    <td><code>/assignment/{arn}</code></td>
+                    <td>Denotes a specific assignment within the delivery (e.g., 1 for the first assignment).</td>
+                </tr>
+                <tr>
+                    <td><code>/submission/{username}/{srn}</code></td>
+                    <td>Represents a specific submission made by a student identified by their username and submission number.</td>
+                </tr>
+                <tr>
+                    <td><code>/{fileName}</code></td>
+                    <td>Directly accesses the submitted file (e.g., Brief.pdf).</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Example:</strong></p>
+        <pre>https://ecs.soton.ac.uk/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf</pre>
+
+        <p><strong>Evaluated:</strong></p>
         <ul>
-            <li>Creation and management of coursework assignments for module deliveries</li>
-            <li>Support for student submissions with version control</li>
-            <li>Multiple submission attempts per student</li>
-            <li>Submission deadlines and late submission handling</li>
-            <li>Assignment feedback and grading</li>
+            <li><code>module/COMP3227</code>: Identifies the COMP3227 module.</li>
+            <li><code>delivery/050198XML</code>: Specifies the delivery identified by CRN 050198XML.</li>
+            <li><code>assignment/1</code>: Denotes the first assignment of the delivery.</li>
+            <li><code>submission/sz10g21/1</code>: Represents the first submission made by student <code>sz10g21</code>.</li>
+            <li><code>Brief.pdf</code>: The actual file submitted.</li>
         </ul>
+        <p>Thus, this URL allows you to access the specific submission file made by a student for a particular assignment in a module's delivery as per URI:</p>
+        <pre>https://ecs.soton.ac.uk/module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}/{fileName}</pre>
     </section>
 
-    <section id="assignments">
-        <h2>Assignments</h2>
-        
-        <h3>Data Model</h3>
-        <table>
-            <tr>
-                <th>Field</th>
-                <th>Type</th>
-                <th>Required</th>
-                <th>Description</th>
-            </tr>
-            <tr>
-                <td>id</td>
-                <td>string</td>
-                <td>Auto</td>
-                <td>Unique identifier, auto-generated if not provided</td>
-            </tr>
-            <tr>
-                <td>title</td>
-                <td>string</td>
-                <td>Yes</td>
-                <td>Title of the assignment (1-100 characters)</td>
-            </tr>
-            <tr>
-                <td>description</td>
-                <td>string</td>
-                <td>Yes</td>
-                <td>Detailed description of the assignment requirements</td>
-            </tr>
-            <tr>
-                <td>deadline</td>
-                <td>ISO8601</td>
-                <td>Yes</td>
-                <td>Submission deadline in UTC (must be in the future)</td>
-            </tr>
-            <tr>
-                <td>weight</td>
-                <td>integer</td>
-                <td>Yes</td>
-                <td>Percentage weight in module assessment (1-100)</td>
-            </tr>
-            <tr>
-                <td>maxAttempts</td>
-                <td>integer</td>
-                <td>No</td>
-                <td>Maximum allowed submission attempts (default: 1)</td>
-            </tr>
-            <tr>
-                <td>allowLateSubmissions</td>
-                <td>boolean</td>
-                <td>No</td>
-                <td>Whether late submissions are permitted (default: false)</td>
-            </tr>
-            <tr>
-                <td>latePenalty</td>
-                <td>integer</td>
-                <td>No</td>
-                <td>Percentage penalty per day late (0-100, default: 0)</td>
-            </tr>
-            <tr>
-                <td>fileTypes</td>
-                <td>array</td>
-                <td>No</td>
-                <td>Allowed file extensions (e.g., ["pdf", "zip"])</td>
-            </tr>
-            <tr>
-                <td>maxFileSize</td>
-                <td>integer</td>
-                <td>No</td>
-                <td>Maximum submission size in bytes (default: 10485760)</td>
-            </tr>
-            <tr>
-                <td>created</td>
-                <td>ISO8601</td>
-                <td>Auto</td>
-                <td>Timestamp of creation</td>
-            </tr>
-            <tr>
-                <td>modified</td>
-                <td>ISO8601</td>
-                <td>Auto</td>
-                <td>Timestamp of last modification</td>
-            </tr>
-        </table>
+    <section id="restful-compliance">
+        <p>Each response includes a <code>_links</code> section containing relevant hypermedia links. These links provide URLs to related resources and available actions.</p>
 
-        <h3>Content Types</h3>
-        <p>All assignment endpoints support the following content types:</p>
-        <ul>
-            <li><code>application/json</code> (default)</li>
-            <li><code>application/xml</code></li>
-            <li><code>text/html</code></li>
-        </ul>
-
-        <h3>Validation Rules</h3>
-        <table>
-            <tr>
-                <th>Rule</th>
-                <th>Description</th>
-                <th>Error Code</th>
-            </tr>
-            <tr>
-                <td>Deadline Validation</td>
-                <td>Deadline must be at least 24 hours in the future for new assignments</td>
-                <td>422</td>
-            </tr>
-            <tr>
-                <td>Weight Range</td>
-                <td>Weight must be between 1 and 100</td>
-                <td>422</td>
-            </tr>
-            <tr>
-                <td>Title Length</td>
-                <td>Title must be between 1 and 100 characters</td>
-                <td>422</td>
-            </tr>
-            <tr>
-                <td>Description Length</td>
-                <td>Description must not exceed 5000 characters</td>
-                <td>422</td>
-            </tr>
-            <tr>
-                <td>File Types</td>
-                <td>Must be valid MIME types or file extensions</td>
-                <td>422</td>
-            </tr>
-            <tr>
-                <td>Duplicate Prevention</td>
-                <td>Assignment IDs must be unique within a delivery</td>
-                <td>409</td>
-            </tr>
-            <tr>
-                <td>Modification Lock</td>
-                <td>Cannot modify deadline if submissions exist and new deadline would be earlier</td>
-                <td>409</td>
-            </tr>
-            <tr>
-                <td>Deletion Lock</td>
-                <td>Cannot delete assignment if graded submissions exist</td>
-                <td>409</td>
-            </tr>
-        </table>
-
-        <h3>Security Considerations</h3>
-        <ul>
-            <li>Only module leaders and administrators can create, modify, or delete assignments</li>
-            <li>Students can only view assignments for modules they are enrolled in</li>
-            <li>All modifications are logged with user ID and timestamp</li>
-            <li>Batch operations require elevated permissions</li>
-        </ul>
-
-        <h3>Batch Operations</h3>
-        <div class="endpoint">
-            <h4>Batch Create Assignments</h4>
-            <span class="method post">POST</span>
-            <span class="uri-template">/delivery/{crn}/assignments/batch</span>
-            
-            <div class="description">
-                Creates multiple assignments in a single request. All assignments must be valid or none will be created.
-            </div>
-
-            <h4>Request Body</h4>
-            <pre>{
-  "assignments": [
-    {
-      "title": "Coursework 1",
-      "description": "First assignment description",
-      "deadline": "2024-11-22T16:00:00Z",
-      "weight": 25,
-      "maxAttempts": 2
-    },
-    {
-      "title": "Coursework 2",
-      "description": "Second assignment description",
-      "deadline": "2024-12-13T16:00:00Z",
-      "weight": 75,
-      "maxAttempts": 1
-    }
-  ]
-}</pre>
-        </div>
-
-        <h3>Alternative Formats</h3>
-        <div class="endpoint">
-            <h4>XML Example</h4>
-            <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;assignment&gt;
-    &lt;title&gt;API Implementation&lt;/title&gt;
-    &lt;description&gt;Implement a REST API following the specification&lt;/description&gt;
-    &lt;deadline&gt;2024-11-22T16:00:00Z&lt;/deadline&gt;
-    &lt;weight&gt;50&lt;/weight&gt;
-    &lt;maxAttempts&gt;3&lt;/maxAttempts&gt;
-    &lt;allowLateSubmissions&gt;true&lt;/allowLateSubmissions&gt;
-    &lt;latePenalty&gt;5&lt;/latePenalty&gt;
-    &lt;fileTypes&gt;
-        &lt;type&gt;zip&lt;/type&gt;
-        &lt;type&gt;pdf&lt;/type&gt;
-    &lt;/fileTypes&gt;
-&lt;/assignment&gt;</pre>
-
-            <h4>HTML Response Example</h4>
-            <pre>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;body&gt;
-    &lt;div class="assignment"&gt;
-        &lt;h1&gt;API Implementation&lt;/h1&gt;
-        &lt;p class="description"&gt;Implement a REST API following the specification&lt;/p&gt;
-        &lt;dl&gt;
-            &lt;dt&gt;Deadline&lt;/dt&gt;
-            &lt;dd&gt;2024-11-22 16:00 UTC&lt;/dd&gt;
-            &lt;dt&gt;Weight&lt;/dt&gt;
-            &lt;dd&gt;50%&lt;/dd&gt;
-            &lt;dt&gt;Maximum Attempts&lt;/dt&gt;
-            &lt;dd&gt;3&lt;/dd&gt;
-        &lt;/dl&gt;
-        &lt;ul class="links"&gt;
-            &lt;li&gt;&lt;a href="/delivery/COMP3227/assignments/cw1"&gt;Self&lt;/a&gt;&lt;/li&gt;
-            &lt;li&gt;&lt;a href="/delivery/COMP3227/assignments/cw1/submissions"&gt;Submit&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-    &lt;/div&gt;
-&lt;/body&gt;
-&lt;/html&gt;</pre>
-        </div>
-
-        <div class="endpoint">
-            <h3>List Assignments</h3>
-            <span class="method get">GET</span>
-            <span class="uri-template">/delivery/{crn}/assignments</span>
-            
-            <div class="description">
-                Retrieves all assignments for a specific module delivery.
-            </div>
-
-            <h4>Parameters</h4>
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                <tr>
-                    <td class="param-required">crn</td>
-                    <td>string</td>
-                    <td>The Course Reference Number (CRN) of the module delivery</td>
-                </tr>
-            </table>
-
-            <h4>Example Response</h4>
-            <pre>{
-  "assignments": [
-    {
-      "id": "cw1",
-      "title": "API Implementation",
-      "description": "Implement a REST API following the provided specification",
-      "deadline": "2024-11-22T16:00:00Z",
-      "weight": 50,
-      "maxAttempts": 3,
-      "self": "/delivery/COMP3227/assignments/cw1",
-      "submissions": "/delivery/COMP3227/assignments/cw1/submissions",
-      "_links": {
-        "delivery": "/delivery/COMP3227",
-        "submit": "/delivery/COMP3227/assignments/cw1/submissions"
-      }
-    }
-  ],
-  "page": 1,
-  "pageSize": 10,
-  "totalItems": 1
-}</pre>
-        </div>
-
-        <div class="endpoint">
-            <h3>Create Assignment</h3>
-            <span class="method post">POST</span>
-            <span class="uri-template">/delivery/{crn}/assignments</span>
-            
-            <div class="description">
-                Creates a new assignment for a module delivery.
-            </div>
-
-            <h4>Parameters</h4>
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                <tr>
-                    <td class="param-required">crn</td>
-                    <td>string</td>
-                    <td>The Course Reference Number (CRN) of the module delivery</td>
-                </tr>
-            </table>
-
-            <h4>Request Body Formats</h4>
-            
-            <h5>JSON (application/json)</h5>
-            <pre>{
-  "title": "API Implementation",
-  "description": "Implement a REST API following the provided specification",
-  "deadline": "2024-11-22T16:00:00Z",
-  "weight": 50,
-  "maxAttempts": 3,
-  "allowLateSubmissions": true,
-  "latePenalty": 5
-}</pre>
-
-            <h5>XML (application/xml)</h5>
-            <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;assignment&gt;
-    &lt;title&gt;API Implementation&lt;/title&gt;
-    &lt;description&gt;Implement a REST API following the provided specification&lt;/description&gt;
-    &lt;deadline&gt;2024-11-22T16:00:00Z&lt;/deadline&gt;
-    &lt;weight&gt;50&lt;/weight&gt;
-    &lt;maxAttempts&gt;3&lt;/maxAttempts&gt;
-    &lt;allowLateSubmissions&gt;true&lt;/allowLateSubmissions&gt;
-    &lt;latePenalty&gt;5&lt;/latePenalty&gt;
-&lt;/assignment&gt;</pre>
-
-            <h5>HTML Form (multipart/form-data)</h5>
-            <pre>&lt;form method="post" action="/delivery/COMP3227/assignments"&gt;
-    &lt;div&gt;
-        &lt;label for="title"&gt;Title:&lt;/label&gt;
-        &lt;input type="text" id="title" name="title" value="API Implementation" required&gt;
-    &lt;/div&gt;
-    &lt;div&gt;
-        &lt;label for="description"&gt;Description:&lt;/label&gt;
-        &lt;textarea id="description" name="description" required&gt;
-            Implement a REST API following the provided specification
-        &lt;/textarea&gt;
-    &lt;/div&gt;
-    &lt;div&gt;
-        &lt;label for="deadline"&gt;Deadline:&lt;/label&gt;
-        &lt;input type="datetime-local" id="deadline" name="deadline" 
-               value="2024-11-22T16:00" required&gt;
-    &lt;/div&gt;
-    &lt;div&gt;
-        &lt;label for="weight"&gt;Weight (%):&lt;/label&gt;
-        &lt;input type="number" id="weight" name="weight" value="50" 
-               min="1" max="100" required&gt;
-    &lt;/div&gt;
-    &lt;div&gt;
-        &lt;label for="maxAttempts"&gt;Maximum Attempts:&lt;/label&gt;
-        &lt;input type="number" id="maxAttempts" name="maxAttempts" 
-               value="3" min="1"&gt;
-    &lt;/div&gt;
-    &lt;div&gt;
-        &lt;label for="allowLateSubmissions"&gt;Allow Late Submissions:&lt;/label&gt;
-        &lt;input type="checkbox" id="allowLateSubmissions" 
-               name="allowLateSubmissions" checked&gt;
-    &lt;/div&gt;
-    &lt;div&gt;
-        &lt;label for="latePenalty"&gt;Late Penalty (%):&lt;/label&gt;
-        &lt;input type="number" id="latePenalty" name="latePenalty" 
-               value="5" min="0" max="100"&gt;
-    &lt;/div&gt;
-    &lt;button type="submit"&gt;Create Assignment&lt;/button&gt;
-&lt;/form&gt;</pre>
-
-            <h4>Example Response</h4>
-            <pre>{
-  "id": "cw1",
-  "title": "API Implementation",
-  "description": "Implement a REST API following the provided specification",
-  "deadline": "2024-11-22T16:00:00Z",
-  "weight": 50,
-  "maxAttempts": 3,
-  "allowLateSubmissions": true,
-  "latePenalty": 5,
-  "self": "/delivery/COMP3227/assignments/cw1",
-  "submissions": "/delivery/COMP3227/assignments/cw1/submissions",
-  "_links": {
-    "delivery": "/delivery/COMP3227",
-    "submit": "/delivery/COMP3227/assignments/cw1/submissions"
-  }
-}</pre>
-        
-        </div>
-
-        <div class="endpoint">
-            <h3>Get Assignment Details</h3>
-            <span class="method get">GET</span>
-            <span class="uri-template">/delivery/{crn}/assignments/{assignmentId}</span>
-            
-            <div class="description">
-                Retrieves detailed information about a specific assignment.
-            </div>
-
-            <h4>Parameters</h4>
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                <tr>
-                    <td class="param-required">crn</td>
-                    <td>string</td>
-                    <td>The Course Reference Number (CRN) of the module delivery</td>
-                </tr>
-                <tr>
-                    <td class="param-required">assignmentId</td>
-                    <td>string</td>
-                    <td>The unique identifier of the assignment</td>
-                </tr>
-            </table>
-
-            <h4>Example Response</h4>
-            <pre>{
-  "id": "cw1",
-  "title": "API Implementation",
-  "description": "Implement a REST API following the provided specification",
-  "deadline": "2024-11-22T16:00:00Z",
-  "weight": 50,
-  "maxAttempts": 3,
-  "allowLateSubmissions": true,
-  "latePenalty": 5,
-  "created": "2024-10-01T09:00:00Z",
-  "modified": "2024-10-01T09:00:00Z",
-  "submissionCount": 12,
-  "self": "/delivery/COMP3227/assignments/cw1",
-  "submissions": "/delivery/COMP3227/assignments/cw1/submissions",
-  "_links": {
-    "delivery": "/delivery/COMP3227",
-    "submit": "/delivery/COMP3227/assignments/cw1/submissions",
-    "update": "/delivery/COMP3227/assignments/cw1",
-    "delete": "/delivery/COMP3227/assignments/cw1"
-  }
-}</pre>
-        </div>
-
-        <div class="endpoint">
-            <h3>Update Assignment</h3>
-            <span class="method put">PUT</span>
-            <span class="uri-template">/delivery/{crn}/assignments/{assignmentId}</span>
-            
-            <div class="description">
-                Updates all fields of an existing assignment. Use PATCH for partial updates.
-            </div>
-
-            <h4>Parameters</h4>
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                <tr>
-                    <td class="param-required">crn</td>
-                    <td>string</td>
-                    <td>The Course Reference Number (CRN) of the module delivery</td>
-                </tr>
-                <tr>
-                    <td class="param-required">assignmentId</td>
-                    <td>string</td>
-                    <td>The unique identifier of the assignment</td>
-                </tr>
-            </table>
-
-            <h4>Request Body Formats</h4>
-            
-            <h5>JSON (application/json)</h5>
-            <pre>{
-  "title": "Updated API Implementation",
-  "description": "Updated specification for REST API implementation",
-  "deadline": "2024-11-29T16:00:00Z",
-  "weight": 50,
-  "maxAttempts": 3,
-  "allowLateSubmissions": true,
-  "latePenalty": 10
-}</pre>
-
-            <h5>XML (application/xml)</h5>
-            <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;assignment&gt;
-    &lt;title&gt;Updated API Implementation&lt;/title&gt;
-    &lt;description&gt;Updated specification for REST API implementation&lt;/description&gt;
-    &lt;deadline&gt;2024-11-29T16:00:00Z&lt;/deadline&gt;
-    &lt;weight&gt;50&lt;/weight&gt;
-    &lt;maxAttempts&gt;3&lt;/maxAttempts&gt;
-    &lt;allowLateSubmissions&gt;true&lt;/allowLateSubmissions&gt;
-    &lt;latePenalty&gt;10&lt;/latePenalty&gt;
-&lt;/assignment&gt;</pre>
-
-            <h5>HTML Form (multipart/form-data)</h5>
-            <pre>&lt;form method="post" action="/delivery/COMP3227/assignments/cw1"&gt;
-    &lt;input type="hidden" name="_method" value="PUT"&gt;
-    &lt;div&gt;
-        &lt;label for="title"&gt;Title:&lt;/label&gt;
-        &lt;input type="text" id="title" name="title" 
-               value="Updated API Implementation" required&gt;
-    &lt;/div&gt;
-    &lt;div&gt;
-        &lt;label for="description"&gt;Description:&lt;/label&gt;
-        &lt;textarea id="description" name="description" required&gt;
-            Updated specification for REST API implementation
-        &lt;/textarea&gt;
-    &lt;/div&gt;
-    &lt;div&gt;
-        &lt;label for="deadline"&gt;Deadline:&lt;/label&gt;
-        &lt;input type="datetime-local" id="deadline" name="deadline" 
-               value="2024-11-29T16:00" required&gt;
-    &lt;/div&gt;
-    &lt;div&gt;
-        &lt;label for="weight"&gt;Weight (%):&lt;/label&gt;
-        &lt;input type="number" id="weight" name="weight" value="50" 
-               min="1" max="100" required&gt;
-    &lt;/div&gt;
-    &lt;div&gt;
-        &lt;label for="maxAttempts"&gt;Maximum Attempts:&lt;/label&gt;
-        &lt;input type="number" id="maxAttempts" name="maxAttempts" 
-               value="3" min="1"&gt;
-    &lt;/div&gt;
-    &lt;div&gt;
-        &lt;label for="allowLateSubmissions"&gt;Allow Late Submissions:&lt;/label&gt;
-        &lt;input type="checkbox" id="allowLateSubmissions" 
-               name="allowLateSubmissions" checked&gt;
-    &lt;/div&gt;
-    &lt;div&gt;
-        &lt;label for="latePenalty"&gt;Late Penalty (%):&lt;/label&gt;
-        &lt;input type="number" id="latePenalty" name="latePenalty" 
-               value="10" min="0" max="100"&gt;
-    &lt;/div&gt;
-    &lt;button type="submit"&gt;Update Assignment&lt;/button&gt;
-&lt;/form&gt;</pre>
-
-            <h4>Example Response</h4>
-            <pre>{
-  "id": "cw1",
-  "title": "Updated API Implementation",
-  "description": "Updated specification for REST API implementation",
-  "deadline": "2024-11-29T16:00:00Z",
-  "weight": 50,
-  "maxAttempts": 3,
-  "allowLateSubmissions": true,
-  "latePenalty": 10,
-  "created": "2024-10-01T09:00:00Z",
-  "modified": "2024-10-15T14:30:00Z",
-  "submissionCount": 12,
-  "self": "/delivery/COMP3227/assignments/cw1",
-  "submissions": "/delivery/COMP3227/assignments/cw1/submissions",
-  "_links": {
-    "delivery": "/delivery/COMP3227",
-    "submit": "/delivery/COMP3227/assignments/cw1/submissions"
-  }
-}</pre>
-        </div>
-
-        <div class="endpoint">
-            <h3>Partial Update Assignment</h3>
-            <span class="method patch">PATCH</span>
-            <span class="uri-template">/delivery/{crn}/assignments/{assignmentId}</span>
-            
-            <div class="description">
-                Updates specific fields of an existing assignment without affecting others.
-            </div>
-
-            <h4>Parameters</h4>
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                <tr>
-                    <td class="param-required">crn</td>
-                    <td>string</td>
-                    <td>The Course Reference Number (CRN) of the module delivery</td>
-                </tr>
-                <tr>
-                    <td class="param-required">assignmentId</td>
-                    <td>string</td>
-                    <td>The unique identifier of the assignment</td>
-                </tr>
-            </table>
-
-            <h4>Request Body Formats</h4>
-            
-            <h5>JSON (application/json)</h5>
-            <pre>{
-  "deadline": "2024-11-29T16:00:00Z",
-  "latePenalty": 10
-}</pre>
-
-            <h5>XML (application/xml)</h5>
-            <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;assignment&gt;
-    &lt;deadline&gt;2024-11-29T16:00:00Z&lt;/deadline&gt;
-    &lt;latePenalty&gt;10&lt;/latePenalty&gt;
-&lt;/assignment&gt;</pre>
-
-            <h5>HTML Form (multipart/form-data)</h5>
-            <pre>&lt;form method="post" action="/delivery/COMP3227/assignments/cw1"&gt;
-    &lt;input type="hidden" name="_method" value="PATCH"&gt;
-    &lt;div&gt;
-        &lt;label for="deadline"&gt;Deadline:&lt;/label&gt;
-        &lt;input type="datetime-local" id="deadline" name="deadline" 
-               value="2024-11-29T16:00" required&gt;
-    &lt;/div&gt;
-    &lt;div&gt;
-        &lt;label for="latePenalty"&gt;Late Penalty (%):&lt;/label&gt;
-        &lt;input type="number" id="latePenalty" name="latePenalty" 
-               value="10" min="0" max="100"&gt;
-    &lt;/div&gt;
-    &lt;button type="submit"&gt;Update Fields&lt;/button&gt;
-&lt;/form&gt;</pre>
-
-            <h4>Example Response</h4>
-            <pre>{
-  "id": "cw1",
-  "title": "API Implementation",
-  "description": "Implement a REST API following the provided specification",
-  "deadline": "2024-11-29T16:00:00Z",
-  "weight": 50,
-  "maxAttempts": 3,
-  "allowLateSubmissions": true,
-  "latePenalty": 10,
-  "created": "2024-10-01T09:00:00Z",
-  "modified": "2024-10-15T14:30:00Z",
-  "submissionCount": 12,
-  "self": "/delivery/COMP3227/assignments/cw1",
-  "submissions": "/delivery/COMP3227/assignments/cw1/submissions",
-  "_links": {
-    "delivery": "/delivery/COMP3227",
-    "submit": "/delivery/COMP3227/assignments/cw1/submissions"
-  }
-}</pre>
-        </div>
-
-        <div class="endpoint">
-            <h3>Delete Assignment</h3>
-            <span class="method delete">DELETE</span>
-            <span class="uri-template">/delivery/{crn}/assignments/{assignmentId}</span>
-            
-            <div class="description">
-                Permanently deletes an assignment and all associated submissions.
-            </div>
-
-            <h4>Parameters</h4>
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                <tr>
-                    <td class="param-required">crn</td>
-                    <td>string</td>
-                    <td>The Course Reference Number (CRN) of the module delivery</td>
-                </tr>
-                <tr>
-                    <td class="param-required">assignmentId</td>
-                    <td>string</td>
-                    <td>The unique identifier of the assignment</td>
-                </tr>
-            </table>
-
-            <h4>Response</h4>
-            <p>Returns HTTP 204 No Content on successful deletion.</p>
-        </div>
-
-        <div class="endpoint">
-            <h3>Assignment Status Codes</h3>
-            <div class="description">
-                The following status codes may be returned by assignment endpoints:
-            </div>
-
-            <table>
-                <tr>
-                    <th>Code</th>
-                    <th>Description</th>
-                </tr>
-                <tr>
-                    <td>200 OK</td>
-                    <td>Successful GET or PATCH request</td>
-                </tr>
-                <tr>
-                    <td>201 Created</td>
-                    <td>Assignment successfully created</td>
-                </tr>
-                <tr>
-                    <td>204 No Content</td>
-                    <td>Assignment successfully deleted</td>
-                </tr>
-                <tr>
-                    <td>400 Bad Request</td>
-                    <td>Invalid request body or parameters</td>
-                </tr>
-                <tr>
-                    <td>403 Forbidden</td>
-                    <td>Insufficient permissions to modify assignment</td>
-                </tr>
-                <tr>
-                    <td>404 Not Found</td>
-                    <td>Assignment or delivery not found</td>
-                </tr>
-                <tr>
-                    <td>409 Conflict</td>
-                    <td>Assignment already exists or cannot be modified due to existing submissions</td>
-                </tr>
-                <tr>
-                    <td>422 Unprocessable Entity</td>
-                    <td>Valid request body but business rules violated (e.g., deadline in past)</td>
-                </tr>
-            </table>
-        </div>
-    </section>
-    <section id="submissions">
-        <h2>Submissions</h2>
-        
-        <h3>Data Model</h3>
-        <table>
-            <tr>
-                <th>Field</th>
-                <th>Type</th>
-                <th>Required</th>
-                <th>Description</th>
-            </tr>
-            <tr>
-                <td>id</td>
-                <td>string</td>
-                <td>Auto</td>
-                <td>Unique submission identifier</td>
-            </tr>
-            <tr>
-                <td>student</td>
-                <td>string</td>
-                <td>Auto</td>
-                <td>URI of submitting student</td>
-            </tr>
-            <tr>
-                <td>assignment</td>
-                <td>string</td>
-                <td>Auto</td>
-                <td>URI of the assignment</td>
-            </tr>
-            <tr>
-                <td>version</td>
-                <td>integer</td>
-                <td>Auto</td>
-                <td>Submission version number (1-based)</td>
-            </tr>
-            <tr>
-                <td>files</td>
-                <td>array</td>
-                <td>Yes</td>
-                <td>Array of submitted file objects</td>
-            </tr>
-            <tr>
-                <td>submittedAt</td>
-                <td>ISO8601</td>
-                <td>Auto</td>
-                <td>Timestamp of submission</td>
-            </tr>
-            <tr>
-                <td>status</td>
-                <td>string</td>
-                <td>Auto</td>
-                <td>One of: draft, submitted, late, graded</td>
-            </tr>
-            <tr>
-                <td>grade</td>
-                <td>object</td>
-                <td>No</td>
-                <td>Grade details when status is graded</td>
-            </tr>
-            <tr>
-                <td>feedback</td>
-                <td>string</td>
-                <td>No</td>
-                <td>Feedback from grader</td>
-            </tr>
-            <tr>
-                <td>latePenalty</td>
-                <td>integer</td>
-                <td>Auto</td>
-                <td>Applied penalty percentage if late</td>
-            </tr>
-        </table>
-
-        <div class="endpoint">
-            <h3>List Submissions</h3>
-            <span class="method get">GET</span>
-            <span class="uri-template">/delivery/{crn}/assignments/{assignmentId}/submissions</span>
-            
-            <div class="description">
-                Retrieves all submissions for an assignment. Results are paginated and can be filtered.
-            </div>
-
-            <h4>Parameters</h4>
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>In</th>
-                    <th>Description</th>
-                </tr>
-                <tr>
-                    <td class="param-required">crn</td>
-                    <td>string</td>
-                    <td>path</td>
-                    <td>Course Reference Number</td>
-                </tr>
-                <tr>
-                    <td class="param-required">assignmentId</td>
-                    <td>string</td>
-                    <td>path</td>
-                    <td>Assignment identifier</td>
-                </tr>
-                <tr>
-                    <td class="param-optional">status</td>
-                    <td>string</td>
-                    <td>query</td>
-                    <td>Filter by status</td>
-                </tr>
-                <tr>
-                    <td class="param-optional">student</td>
-                    <td>string</td>
-                    <td>query</td>
-                    <td>Filter by student username</td>
-                </tr>
-                <tr>
-                    <td class="param-optional">page</td>
-                    <td>integer</td>
-                    <td>query</td>
-                    <td>Page number (default: 1)</td>
-                </tr>
-                <tr>
-                    <td class="param-optional">limit</td>
-                    <td>integer</td>
-                    <td>query</td>
-                    <td>Items per page (default: 20, max: 100)</td>
-                </tr>
-            </table>
-
-            <h4>Response Formats</h4>
-            
-            <h5>JSON (application/json)</h5>
-            <pre>{
-  "submissions": [
-    {
-      "id": "sub123",
-      "student": "/student/sz10g21",
-      "assignment": "/delivery/COMP3227/assignments/cw1",
-      "version": 1,
-      "files": [
-        {
-          "name": "report.pdf",
-          "size": 2097152,
-          "mimeType": "application/pdf",
-          "hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "url": "/delivery/COMP3227/assignments/cw1/submissions/sub123/files/report.pdf"
+        <p><strong>HATEOAS Links in Module:</strong></p>
+        <pre>
+{
+    "Code": "COMP3227",
+    "Title": "Web Architecture and Hypertext Technology",
+    "Description": "Placeholder description.",
+    "deliveries": [],
+    "_links": {
+        "self": {
+            "href": "/module/COMP3227"
+        },
+        "createDelivery": {
+            "href": "/module/COMP3227/delivery",
+            "method": "POST"
+        },
+        "listDeliveries": {
+            "href": "/module/COMP3227/delivery",
+            "method": "GET"
         }
-      ],
-      "submittedAt": "2024-11-20T14:30:00Z",
-      "status": "submitted",
-      "self": "/delivery/COMP3227/assignments/cw1/submissions/sub123",
-      "_links": {
-        "assignment": "/delivery/COMP3227/assignments/cw1",
-        "student": "/student/sz10g21",
-        "files": "/delivery/COMP3227/assignments/cw1/submissions/sub123/files"
-      }
     }
-  ],
-  "page": 1,
-  "pageSize": 20,
-  "totalItems": 1,
-  "_links": {
-    "self": "/delivery/COMP3227/assignments/cw1/submissions?page=1",
-    "first": "/delivery/COMP3227/assignments/cw1/submissions?page=1",
-    "last": "/delivery/COMP3227/assignments/cw1/submissions?page=1"
-  }
-}</pre>
+}
+        </pre>
+        <p>Here, the response includes links to:</p>
+        <ul>
+            <li><code>self</code>: The current resource.</li>
+            <li><code>createDelivery</code>: Endpoint to create a new delivery for the module.</li>
+            <li><code>listDeliveries</code>: Endpoint to list all deliveries for the module.</li>
+        </ul>
 
-            <h5>XML (application/xml)</h5>
-            <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;submissions&gt;
-    &lt;submission&gt;
-        &lt;id&gt;sub123&lt;/id&gt;
-        &lt;student href="/student/sz10g21" /&gt;
-        &lt;assignment href="/delivery/COMP3227/assignments/cw1" /&gt;
-        &lt;version&gt;1&lt;/version&gt;
-        &lt;files&gt;
-            &lt;file&gt;
-                &lt;name&gt;report.pdf&lt;/name&gt;
-                &lt;size&gt;2097152&lt;/size&gt;
-                &lt;mimeType&gt;application/pdf&lt;/mimeType&gt;
-                &lt;hash algorithm="sha256"&gt;
-                    e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-                &lt;/hash&gt;
-                &lt;url&gt;
-                    /delivery/COMP3227/assignments/cw1/submissions/sub123/files/report.pdf
-                &lt;/url&gt;
-            &lt;/file&gt;
-        &lt;/files&gt;
-        &lt;submittedAt&gt;2024-11-20T14:30:00Z&lt;/submittedAt&gt;
-        &lt;status&gt;submitted&lt;/status&gt;
-        &lt;self&gt;/delivery/COMP3227/assignments/cw1/submissions/sub123&lt;/self&gt;
-    &lt;/submission&gt;
-    &lt;page&gt;1&lt;/page&gt;
-    &lt;pageSize&gt;20&lt;/pageSize&gt;
-    &lt;totalItems&gt;1&lt;/totalItems&gt;
-&lt;/submissions&gt;</pre>
+        <p><strong>HATEOAS Links in Submission:</strong></p>
+        <pre>
+{
+    "SubmissionNumber": 1,
+    "Timestamp": "2024-04-15T10:30:00Z",
+    "Content": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf",
+    "student": "/student/sz10g21",
+    "assignment": "/module/COMP3227/delivery/050198XML/assignment/1",
+    "files": [
+        {
+            "FileName": "Brief.pdf",
+            "FileType": "application/pdf",
+            "FileSize": 204800,
+            "Data": "Base64EncodedData",
+            "submission": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1",
+            "_links": {
+                "self": {
+                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf"
+                },
+                "download": {
+                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf",
+                    "method": "GET"
+                }
+            }
+        }
+    ],
+    "_links": {
+        "self": {
+            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1"
+        },
+        "downloadFile": {
+            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf",
+            "method": "GET"
+        },
+        "listFiles": {
+            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/files",
+            "method": "GET"
+        }
+    }
+}
+        </pre>
+        <p>Here, each <code>Submission</code> includes links to:</p>
+        <ul>
+            <li><code>self</code>: The current submission.</li>
+            <li><code>downloadFile</code>: Endpoint to download the submitted file.</li>
+            <li><code>listFiles</code>: Endpoint to list all files associated with the submission.</li>
+        </ul>
 
-            <h5>HTML (text/html)</h5>
-            <pre>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;body&gt;
-    &lt;div class="submissions"&gt;
-        &lt;div class="submission"&gt;
-            &lt;h2&gt;Submission sub123&lt;/h2&gt;
-            &lt;dl&gt;
-                &lt;dt&gt;Student&lt;/dt&gt;
-                &lt;dd&gt;&lt;a href="/student/sz10g21"&gt;sz10g21&lt;/a&gt;&lt;/dd&gt;
-                
-                &lt;dt&gt;Assignment&lt;/dt&gt;
-                &lt;dd&gt;&lt;a href="/delivery/COMP3227/assignments/cw1"&gt;CW1&lt;/a&gt;&lt;/dd&gt;
-                
-                &lt;dt&gt;Version&lt;/dt&gt;
-                &lt;dd&gt;1&lt;/dd&gt;
-                
-                &lt;dt&gt;Submitted&lt;/dt&gt;
-                &lt;dd&gt;20 November 2024, 14:30 UTC&lt;/dd&gt;
-                
-                &lt;dt&gt;Status&lt;/dt&gt;
-                &lt;dd&gt;Submitted&lt;/dd&gt;
-            &lt;/dl&gt;
-            
-            &lt;h3&gt;Files&lt;/h3&gt;
-            &lt;ul&gt;
-                &lt;li&gt;
-                    &lt;a href="/delivery/COMP3227/assignments/cw1/submissions/sub123/files/report.pdf"&gt;
-                        report.pdf (2.0 MB)
-                    &lt;/a&gt;
-                &lt;/li&gt;
-            &lt;/ul&gt;
-        &lt;/div&gt;
-        
-        &lt;div class="pagination"&gt;
-            &lt;p&gt;Page 1 of 1 (1 item)&lt;/p&gt;
-        &lt;/div&gt;
-    &lt;/div&gt;
-&lt;/body&gt;
-&lt;/html&gt;</pre>
+        <p><strong>Semantics:</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Placeholder</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>{code}</code></td>
+                    <td>Module Code (e.g., COMP3227)</td>
+                </tr>
+                <tr>
+                    <td><code>{crn}</code></td>
+                    <td>Course Reference Number identifying the delivery (e.g., 050198XML)</td>
+                </tr>
+                <tr>
+                    <td><code>{arn}</code></td>
+                    <td>Assignment Number (e.g., 1 for the first assignment)</td>
+                </tr>
+                <tr>
+                    <td><code>{srn}</code></td>
+                    <td>Submission Number (e.g., 1 for the first submission)</td>
+                </tr>
+                <tr>
+                    <td><code>{username}</code></td>
+                    <td>Unique identifier for a student (e.g., sz10g21)</td>
+                </tr>
+                <tr>
+                    <td><code>{fileName}</code></td>
+                    <td>Name of the submitted file (e.g., Brief.pdf)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Mermaid State Diagram:</strong></p>
+        <pre>
+stateDiagram-v2
+    [*] --> Modules
+    
+    classDef moduleState fill:#161b22,stroke:#30363d,color:#c9d1d9
+    classDef deliveryState fill:#161b22,stroke:#30363d,color:#56d364
+    classDef assignmentState fill:#161b22,stroke:#30363d,color:#58a6ff
+    classDef submissionState fill:#161b22,stroke:#30363d,color:#a371f7
+    classDef errorState fill:#161b22,stroke:#30363d,color:#f85149
+    classDef normalState fill:#0d1117,stroke:#21262d,color:#8b949e
+    classDef staffState fill:#161b22,stroke:#30363d,color:#e3b341
+    classDef studentState fill:#161b22,stroke:#30363d,color:#56d364
+    classDef fileState fill:#161b22,stroke:#30363d,color:#5bc0de
+
+    state Modules {
+        [*] --> ModuleList: GET /module/
+        ModuleList --> NewModule: POST /module/ (Staff)
+        ModuleList --> SpecificModule: GET /module/{code}
+        state SpecificModule {
+            [*] --> ViewModule: GET /module/{code}
+            ViewModule --> UpdateModule: PUT /module/{code} (Staff)
+            ViewModule --> PartialUpdateModule: PATCH /module/{code} (Staff)
+            ViewModule --> DeleteModule: DELETE /module/{code} (Staff)
+            ViewModule --> Deliveries: GET /module/{code}/delivery
+        }
+        state ModuleErrors {
+            [*] --> InvalidModule: 404 - Module Not Found
+            InvalidModule --> [*]
+        }
+    }
+
+    state Deliveries {
+        [*] --> DeliveryList: GET /module/{code}/delivery
+        DeliveryList --> NewDelivery: POST /module/{code}/delivery (Staff)
+        DeliveryList --> SpecificDelivery: GET /module/{code}/delivery/{crn}
+        state SpecificDelivery {
+            [*] --> ViewDelivery: GET /module/{code}/delivery/{crn}
+            ViewDelivery --> UpdateDelivery: PUT /module/{code}/delivery/{crn} (Staff)
+            ViewDelivery --> DeleteDelivery: DELETE /module/{code}/delivery/{crn} (Staff)
+            ViewDelivery --> Assignments: GET /module/{code}/delivery/{crn}/assignment
+        }
+        state DeliveryErrors {
+            [*] --> UnauthorizedDelivery: 401 - Unauthorized
+            UnauthorizedDelivery --> [*]
+        }
+    }
+
+    state Assignments {
+        [*] --> AssignmentList: GET /module/{code}/delivery/{crn}/assignment
+        AssignmentList --> NewAssignment: POST /module/{code}/delivery/{crn}/assignment (Staff)
+        AssignmentList --> SpecificAssignment: GET /module/{code}/delivery/{crn}/assignment/{arn}
+        state SpecificAssignment {
+            [*] --> ViewAssignment: GET /module/{code}/delivery/{crn}/assignment/{arn}
+            ViewAssignment --> UpdateAssignment: PUT /module/{code}/delivery/{crn}/assignment/{arn} (Staff)
+            ViewAssignment --> PartialUpdateAssignment: PATCH /module/{code}/delivery/{crn}/assignment/{arn} (Staff)
+            ViewAssignment --> DeleteAssignment: DELETE /module/{code}/delivery/{crn}/assignment/{arn} (Staff)
+            ViewAssignment --> Submissions: GET /module/{code}/delivery/{crn}/assignment/{arn}/submission
+        }
+    }
+
+    state Submissions {
+        [*] --> SubmissionList: GET /module/{code}/delivery/{crn}/assignment/{arn}/submission (Staff)
+        SubmissionList --> NewSubmission: POST /module/{code}/delivery/{crn}/assignment/{arn}/submission/{username} (Student)
+        SubmissionList --> SpecificSubmission: GET /module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}
+        state SpecificSubmission {
+            [*] --> ViewSubmission: GET /module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}
+            ViewSubmission --> File: GET /module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}/{fileName}
+        }
+        state SubmissionErrors {
+            [*] --> FileTooLarge: 413 - Payload Too Large
+            [*] --> UnauthorizedSubmission: 401 - Unauthorized
+        }
+    }
+
+    File --> [*]: End
+    DeleteModule --> [*]: End
+    DeleteDelivery --> [*]: End
+    DeleteAssignment --> [*]: End
+    FileTooLarge --> [*]
+    UnauthorizedSubmission --> [*]
+
+    class Modules,ModuleList,NewModule,SpecificModule,ViewModule moduleState
+    class UpdateModule,PartialUpdateModule,DeleteModule staffState
+    class Deliveries,DeliveryList,NewDelivery,SpecificDelivery,ViewDelivery deliveryState
+    class UpdateDelivery,DeleteDelivery staffState
+    class Assignments,AssignmentList,NewAssignment,SpecificAssignment,ViewAssignment assignmentState
+    class UpdateAssignment,PartialUpdateAssignment,DeleteAssignment staffState
+    class Submissions,SubmissionList,SpecificSubmission,ViewSubmission submissionState
+    class NewSubmission studentState
+    class File fileState
+    class ModuleErrors,DeliveryErrors,SubmissionErrors,FileTooLarge,UnauthorizedSubmission,InvalidModule,UnauthorizedDelivery errorState
+        </pre>
+    </section>
+
+    <section id="request-examples">
+        <div class="endpoint">
+            <span class="method options">OPTIONS</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/</span>
+            <p class="description">Check allowed methods for the Modules endpoint:</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+{
+    "Authorization": "Bearer NAUGHTY_TOKEN",
+    "Accept": "application/json"
+}
+            </pre>
+            <p class="description">Response indicating the allowed HTTP methods:</p>
+            <div class="label">Response Headers:</div>
+            <pre>
+Status: 200 OK
+Headers:
+{
+    "Allow": "GET, POST, OPTIONS"
+}
+            </pre>
+            <div class="label">Response Body:</div>
+            <pre>
+{
+    "allowedMethods": ["GET", "POST", "OPTIONS"],
+    "message": "Available methods for /module/: GET, POST, OPTIONS"
+}
+            </pre>
         </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/</span>
+            <p class="description">Create a new module with JSON:</p>
+            <div class="label">Request Body:</div>
+            <pre>
+{
+    "Code": "COMP3227",
+    "Title": "Web Architecture and Hypertext Technology",
+    "Description": "Placeholder description."
+}
+            </pre>
+            <p class="description">Response after successfully creating a new module:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+Status: 201 Created
+Headers:
+{
+    "Content-Type": "application/json",
+    "Location": "/module/COMP3227"
+}
+
+Body:
+{
+    "Code": "COMP3227",
+    "Title": "Web Architecture and Hypertext Technology",
+    "Description": "Placeholder description.",
+    "deliveries": [],
+    "_links": {
+        "self": {
+            "href": "/module/COMP3227"
+        },
+        "createDelivery": {
+            "href": "/module/COMP3227/delivery",
+            "method": "POST"
+        },
+        "listDeliveries": {
+            "href": "/module/COMP3227/delivery",
+            "method": "GET"
+        }
+    }
+}
+            </pre>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="accept-type xml">XML</span>
+            <span>/module/COMP3227/delivery/050198XML</span>
+            <p class="description">Create a new delivery with XML:</p>
+            <div class="label">Request Body:</div>
+            <pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;delivery&gt;
+    &lt;CRN&gt;050198XML&lt;/CRN&gt;
+    &lt;AcademicYear&gt;2024/25&lt;/AcademicYear&gt;
+    &lt;ModuleLeader&gt;Dr. Jane Doe&lt;/ModuleLeader&gt;
+    &lt;module&gt;/module/COMP3227&lt;/module&gt;
+&lt;/delivery&gt;
+            </pre>
+            <p class="description">Response after successfully creating a new delivery:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+Status: 201 Created
+Headers:
+{
+    "Content-Type": "application/xml",
+    "Location": "/module/COMP3227/delivery/050198XML"
+}
+
+Body:
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;delivery&gt;
+    &lt;CRN&gt;050198XML&lt;/CRN&gt;
+    &lt;AcademicYear&gt;2024/25&lt;/AcademicYear&gt;
+    &lt;ModuleLeader&gt;Dr. Jane Doe&lt;/ModuleLeader&gt;
+    &lt;module&gt;/module/COMP3227&lt;/module&gt;
+    &lt;assignments&gt;&lt;/assignments&gt;
+    &lt;students&gt;&lt;/students&gt;
+    &lt;links&gt;
+        &lt;self href="/module/COMP3227/delivery/050198XML"/&gt;
+        &lt;createAssignment href="/module/COMP3227/delivery/050198XML/assignment" method="POST"/&gt;
+        &lt;listAssignments href="/module/COMP3227/delivery/050198XML/assignment" method="GET"/&gt;
+    &lt;/links&gt;
+&lt;/delivery&gt;
+            </pre>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="accept-type html">HTML</span>
+            <span>/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1</span>
+            <p class="description">Submit an assignment using an HTML form.</p>
+            <div class="label">Request Body:</div>
+            <pre>
+&lt;form action="/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1" method="post" enctype="multipart/form-data"&gt;
+    &lt;input type="file" name="Brief.pdf" /&gt;
+    &lt;input type="submit" value="Submit" /&gt;
+&lt;/form&gt;
+            </pre>
+            <p class="description">Response after successfully submitting an assignment:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+Status: 201 Created
+Headers:
+{
+    "Content-Type": "application/json",
+    "Location": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1"
+}
+
+Body:
+{
+    "SubmissionNumber": 1,
+    "Timestamp": "2024-04-15T10:30:00Z",
+    "Content": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf",
+    "student": "/student/sz10g21",
+    "assignment": "/module/COMP3227/delivery/050198XML/assignment/1",
+    "files": [
+        {
+            "FileName": "Brief.pdf",
+            "FileType": "application/pdf",
+            "FileSize": 204800,
+            "Data": "Base64EncodedData",
+            "submission": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1",
+            "_links": {
+                "self": {
+                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf"
+                },
+                "download": {
+                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf",
+                    "method": "GET"
+                }
+            }
+        }
+    ],
+    "_links": {
+        "self": {
+            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1"
+        },
+        "downloadFile": {
+            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf",
+            "method": "GET"
+        },
+        "listFiles": {
+            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/files",
+            "method": "GET"
+        }
+    }
+}
+            </pre>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="accept-type pdf">PDF</span>
+            <span>/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf</span>
+            <p class="description">Retrieve the submitted PDF file.</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+{
+    "Authorization": "Bearer NAUGHTY_TOKEN",
+    "Accept": "application/pdf"
+}
+            </pre>
+            <p class="description">Response with the binary data of the submitted PDF file:</p>
+            <div class="label">Response Headers:</div>
+            <pre>
+Status: 200 OK
+Headers:
+{
+    "Content-Type": "application/pdf",
+    "Content-Disposition": "attachment; filename=\"Brief.pdf\""
+}
+            </pre>
+            <div class="label">Response Body:</div>
+            <pre>
+[Brief.pdf]
+            </pre>
+        </div>
+
+        <div class="endpoint">
+            <span class="method options">OPTIONS</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1</span>
+            <p class="description">Check allowed methods for the specific submission endpoint:</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+{
+    "Authorization": "Bearer NAUGHTY_TOKEN",
+    "Accept": "application/json"
+}
+            </pre>
+            <p class="description">Response indicating the allowed HTTP methods:</p>
+            <div class="label">Response Headers:</div>
+            <pre>
+Status: 200 OK
+Headers:
+{
+    "Allow": "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+}
+            </pre>
+            <div class="label">Response Body:</div>
+            <pre>
+{
+    "allowedMethods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    "message": "Available methods for /module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}: GET, POST, PUT, PATCH, DELETE, OPTIONS"
+}
+            </pre>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/COMP3227/delivery/050198XML</span>
+            <p class="description">Attempt to retrieve delivery details without authentication:</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+{
+    // Missing "Authorization" header
+    "Accept": "application/json"
+}
+            </pre>
+            <p class="description">Response indicating unauthorized access:</p>
+            <div class="label">Response Headers:</div>
+            <pre>
+Status: 401 Unauthorized
+Headers:
+{
+    "Content-Type": "application/json"
+}
+            </pre>
+            <div class="label">Response Body:</div>
+            <pre>
+{
+    "error": "Unauthorized",
+    "message": "Authentication credentials were not provided.",
+    "_links": {
+        "self": {
+            "href": "/module/COMP3227/delivery/050198XML"
+        },
+        "authenticate": {
+            "href": "/auth/login",
+            "method": "POST"
+        }
+    }
+}
+            </pre>
+        </div>
+
+        <div class="endpoint">
+            <span class="method delete">DELETE</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/COMP3227/delivery/999999XML</span>
+            <p class="description">Attempt to delete non-existent delivery:</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+{
+    "Authorization": "Bearer NAUGHTY_TOKEN",
+    "Accept": "application/json"
+}
+            </pre>
+            <p class="description">Response indicating the resource not found:</p>
+            <div class="label">Response Headers:</div>
+            <pre>
+Status: 404 Not Found
+Headers:
+{
+    "Content-Type": "application/json"
+}
+            </pre>
+            <div class="label">Response Body:</div>
+            <pre>
+{
+    "error": "Not Found",
+    "message": "Delivery with CRN 999999XML does not exist.",
+    "_links": {
+        "self": {
+            "href": "/module/COMP3227/delivery/999999XML"
+        },
+        "listDeliveries": {
+            "href": "/module/COMP3227/delivery",
+            "method": "GET"
+        }
+    }
+}
+            </pre>
+        </div>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="accept-type json">JSON</span>
+            <span>/student/{username}</span>
+            <p class="description">Retrieve details of a specific student by their username:</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+        {
+            "Authorization": "Bearer NAUGHTY_TOKEN",
+            "Accept": "application/json"
+        }
+            </pre>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 200 OK
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "Username": "sz10g21",
+            "FirstNames": "John",
+            "LastName": "Doe",
+            "Part": 2,
+            "enrolledIn": [
+                "/module/COMP3227/delivery/050198XML",
+                "/module/COMP3227/delivery/060198XML"
+            ],
+            "_links": {
+                "self": {
+                    "href": "/student/sz10g21"
+                },
+                "listEnrollments": {
+                    "href": "/student/sz10g21/enrollments",
+                    "method": "GET"
+                }
+            }
+        }
+            </pre>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}</span>
+            <p class="description">Submit a new assignment as a student:</p>
+            <div class="label">Request Body:</div>
+            <pre>
+        {
+            "Timestamp": "2024-11-20T12:30:00Z",
+            "Content": "Submission notes or text",
+            "Files": [
+                {
+                    "FileName": "Report.pdf",
+                    "FileType": "application/pdf",
+                    "FileSize": 102400,
+                    "Data": "Base64EncodedData"
+                }
+            ]
+        }
+            </pre>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 201 Created
+        Headers:
+        {
+            "Content-Type": "application/json",
+            "Location": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/2"
+        }
+        
+        Body:
+        {
+            "SubmissionNumber": 2,
+            "Timestamp": "2024-11-20T12:30:00Z",
+            "Content": "Submission notes or text",
+            "Files": [
+                {
+                    "FileName": "Report.pdf",
+                    "FileType": "application/pdf",
+                    "FileSize": 102400,
+                    "Data": "Base64EncodedData",
+                    "_links": {
+                        "self": {
+                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/2/Report.pdf"
+                        },
+                        "download": {
+                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/2/Report.pdf",
+                            "method": "GET"
+                        }
+                    }
+                }
+            ],
+            "_links": {
+                "self": {
+                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/2"
+                }
+            }
+        }
+            </pre>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method delete">DELETE</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/{code}/delivery/{crn}/assignment/{arn}</span>
+            <p class="description">Delete an assignment within a specific delivery:</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+        {
+            "Authorization": "Bearer NAUGHTY_TOKEN",
+            "Accept": "application/json"
+        }
+            </pre>
+            <p class="description">Response indicating successful deletion:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 204 No Content
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+            </pre>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method put">PUT</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/{code}/delivery/{crn}/assignment/{arn}</span>
+            <p class="description">Update the details of an existing assignment:</p>
+            <div class="label">Request Body:</div>
+            <pre>
+        {
+            "Title": "Updated Assignment Title",
+            "Description": "Updated description for the assignment."
+        }
+            </pre>
+            <p class="description">Response indicating successful update:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 200 OK
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "ARN": 1,
+            "Title": "Updated Assignment Title",
+            "Description": "Updated description for the assignment.",
+            "_links": {
+                "self": {
+                    "href": "/module/COMP3227/delivery/050198XML/assignment/1"
+                },
+                "submissions": {
+                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission",
+                    "method": "GET"
+                }
+            }
+        }
+            </pre>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/{code}/delivery/{crn}/assignment/{arn}/submission</span>
+            <p class="description">Retrieve a list of all submissions for a specific assignment:</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+        {
+            "Authorization": "Bearer NAUGHTY_TOKEN",
+            "Accept": "application/json"
+        }
+            </pre>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 200 OK
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "Submissions": [
+                {
+                    "SRN": 1,
+                    "Timestamp": "2024-11-15T09:30:00Z",
+                    "Content": "Initial submission content",
+                    "Student": "/student/sz10g21",
+                    "_links": {
+                        "self": {
+                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1"
+                        }
+                    }
+                },
+                {
+                    "SRN": 2,
+                    "Timestamp": "2024-11-20T12:30:00Z",
+                    "Content": "Resubmission content",
+                    "Student": "/student/sz10g21",
+                    "_links": {
+                        "self": {
+                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/2"
+                        }
+                    }
+                }
+            ],
+            "_links": {
+                "self": {
+                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission"
+                }
+            }
+        }
+            </pre>
+        </div>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/{code}/delivery/{crn}/students</span>
+            <p class="description">Retrieve a list of students enrolled in a specific delivery:</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+        {
+            "Authorization": "Bearer NAUGHTY_TOKEN",
+            "Accept": "application/json"
+        }
+            </pre>
+            <p class="description">Response with a list of enrolled students:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 200 OK
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "students": [
+                {
+                    "Username": "sz10g21",
+                    "FirstNames": "John",
+                    "LastName": "Doe",
+                    "Part": 2,
+                    "_links": {
+                        "self": {
+                            "href": "/student/sz10g21"
+                        }
+                    }
+                },
+                {
+                    "Username": "ab12c34",
+                    "FirstNames": "Jane",
+                    "LastName": "Smith",
+                    "Part": 1,
+                    "_links": {
+                        "self": {
+                            "href": "/student/ab12c34"
+                        }
+                    }
+                }
+            ],
+            "_links": {
+                "self": {
+                    "href": "/module/COMP3227/delivery/050198XML/students"
+                }
+            }
+        }
+            </pre>
+        </div>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/{code}/delivery/{crn}/assignments</span>
+            <p class="description">Retrieve all assignments for a specific delivery:</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+        {
+            "Authorization": "Bearer NAUGHTY_TOKEN",
+            "Accept": "application/json"
+        }
+            </pre>
+            <p class="description">Response with a list of assignments:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 200 OK
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "assignments": [
+                {
+                    "ARN": 1,
+                    "Title": "Assignment 1",
+                    "Description": "Introduction to Web Development",
+                    "_links": {
+                        "self": {
+                            "href": "/module/COMP3227/delivery/050198XML/assignment/1"
+                        }
+                    }
+                },
+                {
+                    "ARN": 2,
+                    "Title": "Assignment 2",
+                    "Description": "Advanced JavaScript Techniques",
+                    "_links": {
+                        "self": {
+                            "href": "/module/COMP3227/delivery/050198XML/assignment/2"
+                        }
+                    }
+                }
+            ],
+            "_links": {
+                "self": {
+                    "href": "/module/COMP3227/delivery/050198XML/assignments"
+                }
+            }
+        }
+            </pre>
+        </div>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/{invalid_code}</span>
+            <p class="description">Attempt to retrieve a module with an invalid or non-existent code:</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+        {
+            "Authorization": "Bearer NAUGHTY_TOKEN",
+            "Accept": "application/json"
+        }
+            </pre>
+            <p class="description">Response indicating the module was not found:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 404 Not Found
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "error": "Not Found",
+            "message": "Module with code INVALID_CODE does not exist.",
+            "_links": {
+                "self": {
+                    "href": "/module/INVALID_CODE"
+                }
+            }
+        }
+            </pre>
+        </div>
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}</span>
+            <p class="description">Attempt to submit a file exceeding the allowed size limit:</p>
+            <div class="label">Request Body:</div>
+            <pre>
+        {
+            "Timestamp": "2024-11-20T12:30:00Z",
+            "Content": "Submission notes or text",
+            "Files": [
+                {
+                    "FileName": "LargeFile.pdf",
+                    "FileType": "application/pdf",
+                    "FileSize": 52428801,
+                    "Data": "Base64EncodedData"
+                }
+            ]
+        }
+            </pre>
+            <p class="description">Response indicating file size exceeded:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 413 Payload Too Large
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "error": "Payload Too Large",
+            "message": "File size exceeds the 50MB limit.",
+            "_links": {
+                "self": {
+                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21"
+                }
+            }
+        }
+            </pre>
+        </div>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}</span>
+            <p class="description">Attempt to retrieve a submission without providing valid authentication:</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+        {
+            "Accept": "application/json"
+        }
+            </pre>
+            <p class="description">Response indicating unauthorized access:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 401 Unauthorized
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "error": "Unauthorized",
+            "message": "Authentication credentials were not provided.",
+            "_links": {
+                "self": {
+                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1"
+                },
+                "authenticate": {
+                    "href": "/auth/login",
+                    "method": "POST"
+                }
+            }
+        }
+            </pre>
+        </div>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}/files</span>
+            <p class="description">Retrieve all files associated with a specific submission:</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+        {
+            "Authorization": "Bearer NAUGHTY_TOKEN",
+            "Accept": "application/json"
+        }
+            </pre>
+            <p class="description">Response with a list of files:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 200 OK
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "files": [
+                {
+                    "FileName": "Brief.pdf",
+                    "FileType": "application/pdf",
+                    "FileSize": 204800,
+                    "_links": {
+                        "self": {
+                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf"
+                        },
+                        "download": {
+                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf",
+                            "method": "GET"
+                        }
+                    }
+                }
+            ],
+            "_links": {
+                "self": {
+                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/files"
+                }
+            }
+        }
+            </pre>
+        </div>
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/</span>
+            <p class="description">Attempt to create a module that already exists:</p>
+            <div class="label">Request Body:</div>
+            <pre>
+        {
+            "Code": "COMP3227",
+            "Title": "Web Architecture and Hypertext Technology",
+            "Description": "Placeholder description."
+        }
+            </pre>
+            <p class="description">Response indicating module already exists:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 409 Conflict
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "error": "Conflict",
+            "message": "Module with code COMP3227 already exists.",
+            "_links": {
+                "self": {
+                    "href": "/module/"
+                },
+                "module": {
+                    "href": "/module/COMP3227",
+                    "method": "GET"
+                }
+            }
+        }
+            </pre>
+        </div>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/{code}/delivery/{crn}/assignment/{arn}/submissions</span>
+            <p class="description">Retrieve all submissions for a specific assignment:</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+        {
+            "Authorization": "Bearer NAUGHTY_TOKEN",
+            "Accept": "application/json"
+        }
+            </pre>
+            <p class="description">Response with a list of submissions:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 200 OK
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "submissions": [
+                {
+                    "SRN": 1,
+                    "Timestamp": "2024-11-21T10:00:00Z",
+                    "Student": "sz10g21",
+                    "_links": {
+                        "self": {
+                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1"
+                        }
+                    }
+                },
+                {
+                    "SRN": 2,
+                    "Timestamp": "2024-11-21T12:00:00Z",
+                    "Student": "ab12c34",
+                    "_links": {
+                        "self": {
+                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/ab12c34/2"
+                        }
+                    }
+                }
+            ],
+            "_links": {
+                "self": {
+                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submissions"
+                }
+            }
+        }
+            </pre>
+        </div>
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/{code}/delivery/{crn}/students</span>
+            <p class="description">Enroll multiple students into a specific delivery:</p>
+            <div class="label">Request Body:</div>
+            <pre>
+        {
+            "students": [
+                {
+                    "Username": "sz10g21",
+                    "FirstNames": "John",
+                    "LastName": "Doe",
+                    "Part": 2
+                },
+                {
+                    "Username": "ab12c34",
+                    "FirstNames": "Jane",
+                    "LastName": "Smith",
+                    "Part": 1
+                }
+            ]
+        }
+            </pre>
+            <p class="description">Response after successfully enrolling students:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 201 Created
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "message": "Students enrolled successfully.",
+            "enrolledStudents": [
+                {
+                    "Username": "sz10g21",
+                    "FirstNames": "John",
+                    "LastName": "Doe",
+                    "Part": 2,
+                    "_links": {
+                        "self": {
+                            "href": "/student/sz10g21"
+                        }
+                    }
+                },
+                {
+                    "Username": "ab12c34",
+                    "FirstNames": "Jane",
+                    "LastName": "Smith",
+                    "Part": 1,
+                    "_links": {
+                        "self": {
+                            "href": "/student/ab12c34"
+                        }
+                    }
+                }
+            ]
+        }
+            </pre>
+        </div>
+        <div class="endpoint">
+            <span class="method patch">PATCH</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/{code}/delivery/{crn}/assignment/{arn}</span>
+            <p class="description">Partially update an assignment's details (e.g., Title or Description):</p>
+            <div class="label">Request Body:</div>
+            <pre>
+        {
+            "Title": "Updated Assignment Title"
+        }
+            </pre>
+            <p class="description">Response after successfully updating the assignment:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 200 OK
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "ARN": 1,
+            "Title": "Updated Assignment Title",
+            "Description": "Introduction to REST",
+            "_links": {
+                "self": {
+                    "href": "/module/COMP3227/delivery/050198XML/assignment/1"
+                }
+            }
+        }
+            </pre>
+        </div>
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/</span>
+            <p class="description">Attempt to create a module with an invalid code format:</p>
+            <div class="label">Request Body:</div>
+            <pre>
+        {
+            "Code": "INVALID_CODE",
+            "Title": "Invalid Module",
+            "Description": "This should fail validation."
+        }
+            </pre>
+            <p class="description">Response indicating validation failure:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 400 Bad Request
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "error": "Bad Request",
+            "message": "Invalid module code format. Expected format: [A-Z]{4}[0-9]{4}",
+            "_links": {
+                "self": {
+                    "href": "/module/"
+                }
+            }
+        }
+            </pre>
+        </div>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="accept-type json">JSON</span>
+            <span>/module/</span>
+            <p class="description">Retrieve a list of all modules:</p>
+            <div class="label">Request Headers:</div>
+            <pre>
+        {
+            "Authorization": "Bearer NAUGHTY_TOKEN",
+            "Accept": "application/json"
+        }
+            </pre>
+            <p class="description">Response listing all modules:</p>
+            <div class="label">Response Body:</div>
+            <pre>
+        Status: 200 OK
+        Headers:
+        {
+            "Content-Type": "application/json"
+        }
+        
+        Body:
+        {
+            "modules": [
+                {
+                    "Code": "COMP3227",
+                    "Title": "Web Architecture and Hypertext Technology",
+                    "_links": {
+                        "self": {
+                            "href": "/module/COMP3227"
+                        }
+                    }
+                },
+                {
+                    "Code": "COMP3228",
+                    "Title": "Hypertext Architecture and Web Technology",
+                    "_links": {
+                        "self": {
+                            "href": "/module/COMP3228"
+                        }
+                    }
+                }
+            ],
+            "_links": {
+                "self": {
+                    "href": "/module/"
+                }
+            }
+        }
+            </pre>
+        </div>                                                           
+    </section>
 </body>
 </html>
