@@ -450,15 +450,15 @@
             <tbody>
                 <tr>
                     <td><code>/module/{code}</code></td>
-                    <td>Identifies a specific module using its unique code (e.g., COMP3227).</td>
+                    <td>Identifies a specific module using its unique code (id est, COMP3227).</td>
                 </tr>
                 <tr>
                     <td><code>/delivery/{crn}</code></td>
-                    <td>Specifies the delivery of the module identified by its Course Reference Number (CRN) (e.g., 050198XML).</td>
+                    <td>Specifies the delivery of the module identified by its Course Reference Number (CRN) (id est, 1946).</td>
                 </tr>
                 <tr>
                     <td><code>/assignment/{arn}</code></td>
-                    <td>Denotes a specific assignment within the delivery (e.g., 1 for the first assignment).</td>
+                    <td>Denotes a specific assignment within the delivery (id est, 1 for the first assignment).</td>
                 </tr>
                 <tr>
                     <td><code>/submission/{username}/{srn}</code></td>
@@ -466,21 +466,21 @@
                 </tr>
                 <tr>
                     <td><code>/{fileName}</code></td>
-                    <td>Directly accesses the submitted file (e.g., Brief.pdf).</td>
+                    <td>Directly accesses the submitted file (id est, Brief.pdf).</td>
                 </tr>
             </tbody>
         </table>
 
         <p><strong>Example:</strong></p>
-        <pre>https://ecs.soton.ac.uk/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf</pre>
+        <pre>https://ecs.soton.ac.uk/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/Brief.pdf</pre>
 
         <p><strong>Evaluated:</strong></p>
         <ul>
-            <li><code>module/COMP3227</code>: Identifies the COMP3227 module.</li>
-            <li><code>delivery/050198XML</code>: Specifies the delivery identified by CRN 050198XML.</li>
-            <li><code>assignment/1</code>: Denotes the first assignment of the delivery.</li>
-            <li><code>submission/sz10g21/1</code>: Represents the first submission made by student <code>sz10g21</code>.</li>
-            <li><code>Brief.pdf</code>: The actual file submitted.</li>
+            <li><code>module/COMP3227</code>: Identifies COMP3227 module.</li>
+            <li><code>delivery/1946</code>: Specifies delivery identified by CRN 1946.</li>
+            <li><code>assignment/1</code>: Denotes first assignment of delivery.</li>
+            <li><code>submission/sz10g21/1</code>: Represents first submission made by student, <code>sz10g21</code>.</li>
+            <li><code>Brief.pdf</code>: The file submitted.</li>
         </ul>
         <p>Thus, this URL allows you to access the specific submission file made by a student for a particular assignment in a module's delivery as per URI:</p>
         <pre>https://ecs.soton.ac.uk/module/{code}/delivery/{crn}/assignment/{arn}/submission/{username}/{srn}/{fileName}</pre>
@@ -523,22 +523,22 @@
 {
     "SubmissionNumber": 1,
     "Timestamp": "2024-04-15T10:30:00Z",
-    "Content": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf",
+    "Content": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/Brief.pdf",
     "student": "/student/sz10g21",
-    "assignment": "/module/COMP3227/delivery/050198XML/assignment/1",
+    "assignment": "/module/COMP3227/delivery/1946/assignment/1",
     "files": [
         {
             "FileName": "Brief.pdf",
             "FileType": "application/pdf",
             "FileSize": 204800,
             "Data": "Base64EncodedData",
-            "submission": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1",
+            "submission": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1",
             "_links": {
                 "self": {
-                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf"
+                    "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/Brief.pdf"
                 },
                 "download": {
-                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf",
+                    "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/Brief.pdf",
                     "method": "GET"
                 }
             }
@@ -546,14 +546,14 @@
     ],
     "_links": {
         "self": {
-            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1"
+            "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1"
         },
         "downloadFile": {
-            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf",
+            "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/Brief.pdf",
             "method": "GET"
         },
         "listFiles": {
-            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/files",
+            "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/files",
             "method": "GET"
         }
     }
@@ -577,27 +577,27 @@
             <tbody>
                 <tr>
                     <td><code>{code}</code></td>
-                    <td>Module Code (e.g., COMP3227)</td>
+                    <td>Module Code (id est, COMP3227)</td>
                 </tr>
                 <tr>
                     <td><code>{crn}</code></td>
-                    <td>Course Reference Number identifying the delivery (e.g., 050198XML)</td>
+                    <td>Course Reference Number identifying the delivery (id est, 1946)</td>
                 </tr>
                 <tr>
                     <td><code>{arn}</code></td>
-                    <td>Assignment Number (e.g., 1 for the first assignment)</td>
+                    <td>Assignment Reference Number (id est, 1 for the first assignment)</td>
                 </tr>
                 <tr>
                     <td><code>{srn}</code></td>
-                    <td>Submission Number (e.g., 1 for the first submission)</td>
+                    <td>Submission Reference Number (id est, 1 for the first submission)</td>
                 </tr>
                 <tr>
                     <td><code>{username}</code></td>
-                    <td>Unique identifier for a student (e.g., sz10g21)</td>
+                    <td>Unique identifier for a student (id est, sz10g21)</td>
                 </tr>
                 <tr>
                     <td><code>{fileName}</code></td>
-                    <td>Name of the submitted file (e.g., Brief.pdf)</td>
+                    <td>Name of submitted file (id est, Brief.pdf)</td>
                 </tr>
             </tbody>
         </table>
@@ -777,13 +777,13 @@ Body:
         <div class="endpoint">
             <span class="method post">POST</span>
             <span class="accept-type xml">XML</span>
-            <span>/module/COMP3227/delivery/050198XML</span>
+            <span>/module/COMP3227/delivery/1946</span>
             <p class="description">Create a new delivery with XML:</p>
             <div class="label">Request Body:</div>
             <pre>
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;delivery&gt;
-    &lt;CRN&gt;050198XML&lt;/CRN&gt;
+    &lt;CRN&gt;1946&lt;/CRN&gt;
     &lt;AcademicYear&gt;2024/25&lt;/AcademicYear&gt;
     &lt;ModuleLeader&gt;Dr. Jane Doe&lt;/ModuleLeader&gt;
     &lt;module&gt;/module/COMP3227&lt;/module&gt;
@@ -796,22 +796,22 @@ Status: 201 Created
 Headers:
 {
     "Content-Type": "application/xml",
-    "Location": "/module/COMP3227/delivery/050198XML"
+    "Location": "/module/COMP3227/delivery/1946"
 }
 
 Body:
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;delivery&gt;
-    &lt;CRN&gt;050198XML&lt;/CRN&gt;
+    &lt;CRN&gt;1946&lt;/CRN&gt;
     &lt;AcademicYear&gt;2024/25&lt;/AcademicYear&gt;
     &lt;ModuleLeader&gt;Dr. Jane Doe&lt;/ModuleLeader&gt;
     &lt;module&gt;/module/COMP3227&lt;/module&gt;
     &lt;assignments&gt;&lt;/assignments&gt;
     &lt;students&gt;&lt;/students&gt;
     &lt;links&gt;
-        &lt;self href="/module/COMP3227/delivery/050198XML"/&gt;
-        &lt;createAssignment href="/module/COMP3227/delivery/050198XML/assignment" method="POST"/&gt;
-        &lt;listAssignments href="/module/COMP3227/delivery/050198XML/assignment" method="GET"/&gt;
+        &lt;self href="/module/COMP3227/delivery/1946"/&gt;
+        &lt;createAssignment href="/module/COMP3227/delivery/1946/assignment" method="POST"/&gt;
+        &lt;listAssignments href="/module/COMP3227/delivery/1946/assignment" method="GET"/&gt;
     &lt;/links&gt;
 &lt;/delivery&gt;
             </pre>
@@ -820,11 +820,11 @@ Body:
         <div class="endpoint">
             <span class="method post">POST</span>
             <span class="accept-type html">HTML</span>
-            <span>/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1</span>
+            <span>/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1</span>
             <p class="description">Submit an assignment using an HTML form.</p>
             <div class="label">Request Body:</div>
             <pre>
-&lt;form action="/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1" method="post" enctype="multipart/form-data"&gt;
+&lt;form action="/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1" method="post" enctype="multipart/form-data"&gt;
     &lt;input type="file" name="Brief.pdf" /&gt;
     &lt;input type="submit" value="Submit" /&gt;
 &lt;/form&gt;
@@ -836,29 +836,29 @@ Status: 201 Created
 Headers:
 {
     "Content-Type": "application/json",
-    "Location": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1"
+    "Location": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1"
 }
 
 Body:
 {
     "SubmissionNumber": 1,
     "Timestamp": "2024-04-15T10:30:00Z",
-    "Content": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf",
+    "Content": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/Brief.pdf",
     "student": "/student/sz10g21",
-    "assignment": "/module/COMP3227/delivery/050198XML/assignment/1",
+    "assignment": "/module/COMP3227/delivery/1946/assignment/1",
     "files": [
         {
             "FileName": "Brief.pdf",
             "FileType": "application/pdf",
             "FileSize": 204800,
             "Data": "Base64EncodedData",
-            "submission": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1",
+            "submission": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1",
             "_links": {
                 "self": {
-                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf"
+                    "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/Brief.pdf"
                 },
                 "download": {
-                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf",
+                    "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/Brief.pdf",
                     "method": "GET"
                 }
             }
@@ -866,14 +866,14 @@ Body:
     ],
     "_links": {
         "self": {
-            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1"
+            "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1"
         },
         "downloadFile": {
-            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf",
+            "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/Brief.pdf",
             "method": "GET"
         },
         "listFiles": {
-            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/files",
+            "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/files",
             "method": "GET"
         }
     }
@@ -884,7 +884,7 @@ Body:
         <div class="endpoint">
             <span class="method get">GET</span>
             <span class="accept-type pdf">PDF</span>
-            <span>/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf</span>
+            <span>/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/Brief.pdf</span>
             <p class="description">Retrieve the submitted PDF file.</p>
             <div class="label">Request Headers:</div>
             <pre>
@@ -912,7 +912,7 @@ Headers:
         <div class="endpoint">
             <span class="method options">OPTIONS</span>
             <span class="accept-type json">JSON</span>
-            <span>/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1</span>
+            <span>/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1</span>
             <p class="description">Check allowed methods for the specific submission endpoint:</p>
             <div class="label">Request Headers:</div>
             <pre>
@@ -942,7 +942,7 @@ Headers:
         <div class="endpoint">
             <span class="method get">GET</span>
             <span class="accept-type json">JSON</span>
-            <span>/module/COMP3227/delivery/050198XML</span>
+            <span>/module/COMP3227/delivery/1946</span>
             <p class="description">Attempt to retrieve delivery details without authentication:</p>
             <div class="label">Request Headers:</div>
             <pre>
@@ -967,7 +967,7 @@ Headers:
     "message": "Authentication credentials were not provided.",
     "_links": {
         "self": {
-            "href": "/module/COMP3227/delivery/050198XML"
+            "href": "/module/COMP3227/delivery/1946"
         },
         "authenticate": {
             "href": "/auth/login",
@@ -981,7 +981,7 @@ Headers:
         <div class="endpoint">
             <span class="method delete">DELETE</span>
             <span class="accept-type json">JSON</span>
-            <span>/module/COMP3227/delivery/999999XML</span>
+            <span>/module/COMP3227/delivery/868869</span>
             <p class="description">Attempt to delete non-existent delivery:</p>
             <div class="label">Request Headers:</div>
             <pre>
@@ -1003,10 +1003,10 @@ Headers:
             <pre>
 {
     "error": "Not Found",
-    "message": "Delivery with CRN 999999XML does not exist.",
+    "message": "Delivery with CRN 868869 does not exist.",
     "_links": {
         "self": {
-            "href": "/module/COMP3227/delivery/999999XML"
+            "href": "/module/COMP3227/delivery/868869"
         },
         "listDeliveries": {
             "href": "/module/COMP3227/delivery",
@@ -1039,11 +1039,11 @@ Headers:
         Body:
         {
             "Username": "sz10g21",
-            "FirstNames": "John",
-            "LastName": "Doe",
+            "FirstNames": "Shaho",
+            "LastName": "Zagrosi",
             "Part": 2,
             "enrolledIn": [
-                "/module/COMP3227/delivery/050198XML",
+                "/module/COMP3227/delivery/1946",
                 "/module/COMP3227/delivery/060198XML"
             ],
             "_links": {
@@ -1085,7 +1085,7 @@ Headers:
         Headers:
         {
             "Content-Type": "application/json",
-            "Location": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/2"
+            "Location": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/2"
         }
         
         Body:
@@ -1101,10 +1101,10 @@ Headers:
                     "Data": "Base64EncodedData",
                     "_links": {
                         "self": {
-                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/2/Report.pdf"
+                            "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/2/Report.pdf"
                         },
                         "download": {
-                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/2/Report.pdf",
+                            "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/2/Report.pdf",
                             "method": "GET"
                         }
                     }
@@ -1112,7 +1112,7 @@ Headers:
             ],
             "_links": {
                 "self": {
-                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/2"
+                    "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/2"
                 }
             }
         }
@@ -1170,10 +1170,10 @@ Headers:
             "Description": "Updated description for the assignment.",
             "_links": {
                 "self": {
-                    "href": "/module/COMP3227/delivery/050198XML/assignment/1"
+                    "href": "/module/COMP3227/delivery/1946/assignment/1"
                 },
                 "submissions": {
-                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission",
+                    "href": "/module/COMP3227/delivery/1946/assignment/1/submission",
                     "method": "GET"
                 }
             }
@@ -1211,7 +1211,7 @@ Headers:
                     "Student": "/student/sz10g21",
                     "_links": {
                         "self": {
-                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1"
+                            "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1"
                         }
                     }
                 },
@@ -1222,14 +1222,14 @@ Headers:
                     "Student": "/student/sz10g21",
                     "_links": {
                         "self": {
-                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/2"
+                            "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/2"
                         }
                     }
                 }
             ],
             "_links": {
                 "self": {
-                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission"
+                    "href": "/module/COMP3227/delivery/1946/assignment/1/submission"
                 }
             }
         }
@@ -1261,8 +1261,8 @@ Headers:
             "students": [
                 {
                     "Username": "sz10g21",
-                    "FirstNames": "John",
-                    "LastName": "Doe",
+                    "FirstNames": "Shaho",
+                    "LastName": "Zagrosi",
                     "Part": 2,
                     "_links": {
                         "self": {
@@ -1271,20 +1271,20 @@ Headers:
                     }
                 },
                 {
-                    "Username": "ab12c34",
-                    "FirstNames": "Jane",
-                    "LastName": "Smith",
+                    "Username": "sz10g22",
+                    "FirstNames": "Zhaho",
+                    "LastName": "Sagrosi",
                     "Part": 1,
                     "_links": {
                         "self": {
-                            "href": "/student/ab12c34"
+                            "href": "/student/sz10g22"
                         }
                     }
                 }
             ],
             "_links": {
                 "self": {
-                    "href": "/module/COMP3227/delivery/050198XML/students"
+                    "href": "/module/COMP3227/delivery/1946/students"
                 }
             }
         }
@@ -1317,27 +1317,27 @@ Headers:
                 {
                     "ARN": 1,
                     "Title": "Assignment 1",
-                    "Description": "Introduction to Web Development",
+                    "Description": "Introduction to HATEOAS",
                     "_links": {
                         "self": {
-                            "href": "/module/COMP3227/delivery/050198XML/assignment/1"
+                            "href": "/module/COMP3227/delivery/1946/assignment/1"
                         }
                     }
                 },
                 {
                     "ARN": 2,
                     "Title": "Assignment 2",
-                    "Description": "Advanced JavaScript Techniques",
+                    "Description": "Introduction to JSON",
                     "_links": {
                         "self": {
-                            "href": "/module/COMP3227/delivery/050198XML/assignment/2"
+                            "href": "/module/COMP3227/delivery/1946/assignment/2"
                         }
                     }
                 }
             ],
             "_links": {
                 "self": {
-                    "href": "/module/COMP3227/delivery/050198XML/assignments"
+                    "href": "/module/COMP3227/delivery/1946/assignments"
                 }
             }
         }
@@ -1388,7 +1388,7 @@ Headers:
             "Content": "Submission notes or text",
             "Files": [
                 {
-                    "FileName": "LargeFile.pdf",
+                    "FileName": "GTA-VI.pdf",
                     "FileType": "application/pdf",
                     "FileSize": 52428801,
                     "Data": "Base64EncodedData"
@@ -1411,7 +1411,7 @@ Headers:
             "message": "File size exceeds the 50MB limit.",
             "_links": {
                 "self": {
-                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21"
+                    "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21"
                 }
             }
         }
@@ -1443,7 +1443,7 @@ Headers:
             "message": "Authentication credentials were not provided.",
             "_links": {
                 "self": {
-                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1"
+                    "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1"
                 },
                 "authenticate": {
                     "href": "/auth/login",
@@ -1483,10 +1483,10 @@ Headers:
                     "FileSize": 204800,
                     "_links": {
                         "self": {
-                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf"
+                            "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/Brief.pdf"
                         },
                         "download": {
-                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/Brief.pdf",
+                            "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/Brief.pdf",
                             "method": "GET"
                         }
                     }
@@ -1494,7 +1494,7 @@ Headers:
             ],
             "_links": {
                 "self": {
-                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1/files"
+                    "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1/files"
                 }
             }
         }
@@ -1568,24 +1568,24 @@ Headers:
                     "Student": "sz10g21",
                     "_links": {
                         "self": {
-                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/sz10g21/1"
+                            "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g21/1"
                         }
                     }
                 },
                 {
                     "SRN": 2,
                     "Timestamp": "2024-11-21T12:00:00Z",
-                    "Student": "ab12c34",
+                    "Student": "sz10g22",
                     "_links": {
                         "self": {
-                            "href": "/module/COMP3227/delivery/050198XML/assignment/1/submission/ab12c34/2"
+                            "href": "/module/COMP3227/delivery/1946/assignment/1/submission/sz10g22/2"
                         }
                     }
                 }
             ],
             "_links": {
                 "self": {
-                    "href": "/module/COMP3227/delivery/050198XML/assignment/1/submissions"
+                    "href": "/module/COMP3227/delivery/1946/assignment/1/submissions"
                 }
             }
         }
@@ -1602,14 +1602,14 @@ Headers:
             "students": [
                 {
                     "Username": "sz10g21",
-                    "FirstNames": "John",
-                    "LastName": "Doe",
+                    "FirstNames": "Shaho",
+                    "LastName": "Zagrosi",
                     "Part": 2
                 },
                 {
-                    "Username": "ab12c34",
-                    "FirstNames": "Jane",
-                    "LastName": "Smith",
+                    "Username": "sz10g22",
+                    "FirstNames": "Zhaho",
+                    "LastName": "Sagrosi",
                     "Part": 1
                 }
             ]
@@ -1630,8 +1630,8 @@ Headers:
             "enrolledStudents": [
                 {
                     "Username": "sz10g21",
-                    "FirstNames": "John",
-                    "LastName": "Doe",
+                    "FirstNames": "Shaho",
+                    "LastName": "Zagrosi",
                     "Part": 2,
                     "_links": {
                         "self": {
@@ -1640,13 +1640,13 @@ Headers:
                     }
                 },
                 {
-                    "Username": "ab12c34",
-                    "FirstNames": "Jane",
-                    "LastName": "Smith",
+                    "Username": "sz10g22",
+                    "FirstNames": "Zhaho",
+                    "LastName": "Sagrosi",
                     "Part": 1,
                     "_links": {
                         "self": {
-                            "href": "/student/ab12c34"
+                            "href": "/student/sz10g22"
                         }
                     }
                 }
@@ -1658,7 +1658,7 @@ Headers:
             <span class="method patch">PATCH</span>
             <span class="accept-type json">JSON</span>
             <span>/module/{code}/delivery/{crn}/assignment/{arn}</span>
-            <p class="description">Partially update an assignment's details (e.g., Title or Description):</p>
+            <p class="description">Partially update an assignment's details (id est, Title or Description):</p>
             <div class="label">Request Body:</div>
             <pre>
         {
@@ -1681,7 +1681,7 @@ Headers:
             "Description": "Introduction to REST",
             "_links": {
                 "self": {
-                    "href": "/module/COMP3227/delivery/050198XML/assignment/1"
+                    "href": "/module/COMP3227/delivery/1946/assignment/1"
                 }
             }
         }
